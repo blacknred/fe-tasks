@@ -1,0 +1,31 @@
+.header {
+  display: flex;
+  gap: 1rem;
+}
+
+.main {
+  width: 40%;
+
+  & ul {
+    list-style-type: none;
+
+    & li {
+      display: flex;
+      text-align: left;
+      gap: 1rem;
+
+      & > div:first-child > div {
+        background-color: lightgrey;
+        width: 3.5rem;
+        height: 3.5rem;
+        text-align: center;
+        line-height: 3.5rem;
+      }
+
+      & > div:nth-child(2) > li {
+        opacity: 0.5;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

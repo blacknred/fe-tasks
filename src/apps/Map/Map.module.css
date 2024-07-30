@@ -1,0 +1,31 @@
+.header {
+  display: flex;
+  gap: 1rem;
+}
+
+.main {
+  width: 60%;
+  height: 50vh;
+  display: flex;
+  justify-content: space-between;
+
+  & > div:first-child {
+    width: 250px;
+    overflow-y: scroll;
+    height: 100%;
+
+    & ul {
+      list-style-type: none;
+
+      & li {
+        text-align: left;
+        padding: 1em;
+        border-bottom: 1px solid lightgray;
+      }
+    }
+  }
+}
+
+.active {
+  background-color: yellowgreen;
+}

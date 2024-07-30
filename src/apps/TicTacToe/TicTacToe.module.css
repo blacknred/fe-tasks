@@ -1,0 +1,19 @@
+.header {
+  display: flex;
+  gap: 1em;
+}
+.main {
+  & > div {
+    display: grid;
+    grid-gap: 1em;
+    grid-template: repeat(3, 3em) / repeat(3, 3em);
+
+    & button {
+      background-color: lightgray;
+      border: none;
+      &:disabled {
+        background-color: #bbb;
+      }
+    }
+  }
+}

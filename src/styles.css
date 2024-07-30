@@ -1,0 +1,38 @@
+:root {
+  --color-light: black;
+  --color-dark: white;
+  --bg-light: white;
+  --bg-dark: black;
+
+  &[data-theme="light"] {
+    background-color: var(--bg-light);
+    color: var(--color-light);
+  }
+
+  &[data-theme="dark"] {
+    background-color: var(--bg-dark);
+    color: var(--color-dark);
+  }
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+
+  & > header > ul {
+    display: flex;
+    gap: 1em;
+    list-style-type: none;
+
+    & > li:last-child {
+      display: flex;
+    }
+  }
+
+  & > main {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+}

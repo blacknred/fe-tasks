@@ -1,0 +1,1 @@
+export type IBoard = ("X" | "0" | null)[];

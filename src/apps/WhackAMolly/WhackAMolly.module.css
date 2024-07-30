@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  gap: 1rem;
+}
+.grid {
+  display: grid;
+  grid-gap: 1em;
+  grid-template: repeat(8, 3em) / repeat(8, 3em);
+
+  & button {
+    background-color: lightgray;
+    border: none;
+    &.active {
+      background-color: brown;
+    }
+  }
+}

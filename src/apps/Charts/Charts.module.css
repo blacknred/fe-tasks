@@ -1,0 +1,9 @@
+.header {
+  display: flex;
+  gap: 1rem;
+}
+
+.main {
+  width: 50%;
+  height: 50vh;
+}
