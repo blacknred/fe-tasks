@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { Board } from "./Board";
+import { Board } from "./components/Board";
 import styles from "./TicTacToe.module.css";
 import { IBoard } from "./types";
 import { findWonStrategy, STRATEGIES } from "./utils";

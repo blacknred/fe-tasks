@@ -1,8 +1,8 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { Board } from "./Board";
-import { Timer } from "./Timer";
-import { CELLS_COUNT, DURATION } from "./utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./WhackAMolly.module.css";
+import { Board } from "./components/Board";
+import { Timer } from "./components/Timer";
+import { DURATION } from "./utils";
 
 export type WhackAMollyProps = {
   capacity?: number;
@@ -39,7 +39,11 @@ export function WhackAMolly({ capacity = 64 }: WhackAMollyProps) {
         {status === 0 ? (
           <>
             <label htmlFor="level">Level</label>
-            <select onChange={(e) => (level.current = e.target.value)}>
+            <select
+              onChange={(e) => {
+                level.current = +e.target.value as 1;
+              }}
+            >
               <option value="1" defaultChecked>
                 1
               </option>

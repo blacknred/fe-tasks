@@ -1,14 +1,14 @@
-import { memo, ReactNode, useEffect, useState } from "react";
+import { memo, ReactElement, useEffect, useState } from "react";
 
 export type TimerProps = {
   duration: number;
   isPaused: boolean;
   onEnd: () => void;
-  children?: (value: number) => ReactNode;
+  children?: (value: number) => ReactElement;
 };
 
-export const Timer = memo(
-  ({ duration, isPaused, onEnd, children }: TimerProps) => {
+export const Timer = memo<TimerProps>(
+  ({ duration, isPaused, onEnd, children }) => {
     const [secondsLeft, setSecondsLeft] = useState<number>(duration);
 
     useEffect(() => {
@@ -26,6 +26,6 @@ export const Timer = memo(
       return () => clearInterval(timeout);
     }, [duration, isPaused, onEnd]);
 
-    return children ? children(secondsLeft) : secondsLeft;
+    return <>{children ? children(secondsLeft) : secondsLeft}</>;
   }
 );

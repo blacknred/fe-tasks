@@ -1,5 +1,5 @@
 import { Dispatch, memo, SetStateAction, useEffect, useState } from "react";
-import styles from "./WhackAMolly.module.css";
+import styles from "../WhackAMolly.module.css";
 
 export type BoardProps = {
   capacity: number;
@@ -27,10 +27,10 @@ export const Board = memo(({ capacity, level = 1, setScore }: BoardProps) => {
           <button
             key={idx}
             className={position === idx ? styles.active : ""}
-            onClick={(e) => {
+            onClick={(ev) => {
               if (position !== idx) return;
               setScore((prev) => prev + 1);
-              e.target.disabled = true;
+              ev.currentTarget.disabled = true;
             }}
           />
         ))}

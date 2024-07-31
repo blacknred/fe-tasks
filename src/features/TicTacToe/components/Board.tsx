@@ -5,8 +5,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { IBoard } from "./types";
-import { getRandomEmptyIndex } from "./utils";
+import { IBoard } from "../types";
+import { getRandomEmptyIndex } from "../utils";
 
 type BoardProps = { capacity: number; onCheck: (board: IBoard) => void };
 

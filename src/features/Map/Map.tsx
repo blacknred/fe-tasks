@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  LayerGroup,
   LayersControl,
   MapContainer,
   TileLayer,
-  LayerGroup,
 } from "react-leaflet";
-import { usePlanes } from "./api";
 import styles from "./Map.module.css";
-import { Markers } from "./Markers";
+import { usePlanes } from "./api";
+import { Markers } from "./components/Markers";
 import { IPlane, IPlanePosition, IPositionBoundaries } from "./types";
 import { findCenterFromBoundaries } from "./utils";
 
@@ -24,7 +24,7 @@ export function Map({ boundaries }: MapProps) {
     [boundaries]
   );
 
-  const liRef = useRef<HTMLLIElement>();
+  const liRef = useRef<HTMLLIElement | null>();
   const map = useRef<L.Map>(null);
   const layersRef = useRef<{
     findSelectedPlanePosition: () => IPlanePosition;
@@ -53,7 +53,9 @@ export function Map({ boundaries }: MapProps) {
                 <li
                   key={plane.code}
                   className={selectedCode === plane.code ? styles.active : ""}
-                  ref={selectedCode === plane.code ? liRef : undefined}
+                  ref={(el) => {
+                    if (selectedCode === plane.code) liRef.current = el;
+                  }}
                 >
                   <a
                     href="#"
@@ -98,20 +100,3 @@ export function Map({ boundaries }: MapProps) {
     </>
   );
 }
-
-// function SetViewOnClick({ animateRef }) {
-//   const map = useMapEvent("click", (e) => {
-//     map.setView(e.latlng, map.getZoom(), {
-//       animate: animateRef.current || false,
-//     });
-//   });
-
-//   return null;
-// }
-
-// const animateRef = useRef(true);
-// const map = useMapEvent("click", (e) => {
-//   map.setView(e.latlng, map.getZoom(), {
-//     animate: animateRef.current || false,
-//   });
-// });

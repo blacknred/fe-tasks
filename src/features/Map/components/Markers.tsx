@@ -7,9 +7,9 @@ import {
   useImperativeHandle,
 } from "react";
 import { Marker, Tooltip } from "react-leaflet";
-import { usePlanePositions } from "./api";
-import icon from "./plane.png";
-import { IPlane, IPositionBoundaries } from "./types";
+import { usePlanePositions } from "../api";
+import { IPlane, IPositionBoundaries } from "../types";
+import icon from "../assets/plane.png";
 
 const planeIcon = L.icon({
   iconUrl: icon,

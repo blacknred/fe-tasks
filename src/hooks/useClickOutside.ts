@@ -1,14 +1,14 @@
-import { MutableRefObject, ReactEventHandler, useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 
 export default function useClickOutside(
   ref: MutableRefObject<Element>,
-  callback: ReactEventHandler<UIEvent>
+  callback: () => void
 ) {
   const memoizedCallback = useRef(callback);
 
   useEffect(() => {
-    function handler({ target }: UIEvent) {
-      if (!ref.current.contains(target)) {
+    function handler(ev: MouseEvent) {
+      if (!!ev.target && !ref.current.contains(ev.target as Node)) {
         memoizedCallback.current();
       }
     }

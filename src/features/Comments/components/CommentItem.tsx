@@ -1,16 +1,8 @@
-import { useState, ReactElement } from "react";
-import type { IComment } from "./types";
+import { useState } from "react";
+import type { IComment } from "../types";
+import { CommentList } from "./CommentList";
 
-type ListProps<Type> = {
-  items: Type[];
-  renderItem: (item: Type) => ReactElement;
-};
-
-function List<Type>({ items, renderItem }: ListProps<Type>) {
-  return <ul>{items.map(renderItem)}</ul>;
-}
-
-function Comment(props: IComment) {
+export function CommentItem(props: IComment) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
@@ -22,7 +14,7 @@ function Comment(props: IComment) {
       </div>
       <div>
         <h4>{props.name}</h4>
-        {!!props.parent && <Comment {...props.parent} />}
+        {!!props.parent && <CommentItem {...props.parent} />}
         <p>{props.body}</p>
         {!!props.children?.length && (
           <>
@@ -40,10 +32,3 @@ function Comment(props: IComment) {
     </li>
   );
 }
-
-export const CommentList = ({ data }: { data: IComment[] }) => (
-  <List<IComment>
-    items={data}
-    renderItem={(item) => <Comment key={item.id} {...item} />}
-  />
-);

@@ -7,8 +7,12 @@ export function Router({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const { proxy, revoke } = Proxy.revocable(window.history.pushState, {
-      apply(target, thisArg, argArray) {
-        if (argArray[2]) setPath(argArray[2]);
+      apply(
+        target,
+        thisArg,
+        argArray: Parameters<typeof window.history.pushState>
+      ) {
+        if (argArray[2]) setPath(argArray[2] as string);
         target.apply(thisArg, argArray);
       },
     });
@@ -19,7 +23,7 @@ export function Router({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (needFallback.current) {
-      window.history.pushState(null, null, "/");
+      window.history.pushState(null, "", "/");
     }
   }, [path]);
 

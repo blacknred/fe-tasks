@@ -4,7 +4,7 @@ import styles from "./Countdown.module.css";
 export function Countdown() {
   const [isStarted, setIsStarted] = useState(false);
   const [counter, setCounter] = useState(0);
-  const timer = useRef<number>(0);
+  const timer = useRef<NodeJS.Timeout>();
   const snapshots = useRef<number[]>([]);
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export function Countdown() {
       timer.current = setInterval(() => setCounter((prev) => prev + 1), 1000);
     } else if (!isStarted && timer.current) {
       clearInterval(timer.current);
-      timer.current = 0;
+      timer.current = undefined;
     }
 
     return () => clearInterval(timer.current);

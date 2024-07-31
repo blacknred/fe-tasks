@@ -12,7 +12,7 @@ export function Link({ path, state, children }: LinkProps) {
       children={children}
       onClick={(e) => {
         e.preventDefault();
-        window.history.pushState(state, null, path);
+        window.history.pushState(state, "", path);
       }}
     />
   );

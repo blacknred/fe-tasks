@@ -72,7 +72,7 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
   useEffect(() => {
     fetcher(true);
 
-    let interval: number;
+    let interval: NodeJS.Timeout;
     const { refetchInterval } = memoizedOptions.current || {};
 
     const handleVisibilityRefetch = () => !document.hidden && fetcher(false);

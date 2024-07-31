@@ -128,10 +128,10 @@ export function Charts() {
             data={data}
           >
             <RadialBar
-              minAngle={15}
+              // minAngle={15}
               label={{ position: "insideStart", fill: "#fff" }}
               background
-              clockWise
+              // clockWise
               dataKey="uv"
             />
             <Legend iconSize={10} layout="vertical" verticalAlign="middle" />

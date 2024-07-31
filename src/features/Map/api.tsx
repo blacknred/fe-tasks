@@ -7,7 +7,7 @@ import { PLANECODES, planePositionGenerator } from "./utils";
 const HOST = "https://echo.websocket.org/.ws";
 
 export const usePlanePositions = (boundaries: IPositionBoundaries) => {
-  let timer = useRef<number>();
+  let timer = useRef<NodeJS.Timeout>();
 
   const subscription = useSubscription<IPlanePosition[]>(HOST, {
     type: "websocket",
