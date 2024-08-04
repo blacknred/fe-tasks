@@ -1,5 +1,8 @@
 import { useState } from "react";
 import styles from "./Issues.module.css";
+import { Gantt } from "./components/gantt/Gantt";
+import { Backlog } from "./components/backlog/Backlog";
+import { Board } from "./components/board/Board";
 
 export function Issues() {
   const [viewKind, setViewKind] = useState<1 | 2 | 3>(1);
@@ -15,9 +18,9 @@ export function Issues() {
       </header>
       <br />
       <main className={styles.main}>
-        {viewKind === 1 && <p>Gantt</p>}
-        {viewKind === 2 && <p>Board</p>}
-        {viewKind === 3 && <p>Backlog</p>}
+        {viewKind === 1 && <Gantt />}
+        {viewKind === 2 && <Board />}
+        {viewKind === 3 && <Backlog />}
       </main>
     </>
   );

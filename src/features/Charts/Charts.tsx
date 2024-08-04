@@ -18,20 +18,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useSensors } from "./api";
 import styles from "./Charts.module.css";
+import { useSensors } from "./api";
 import type { ISensor } from "./types";
-import { generateSensorEntry } from "./utils";
 
 export function Charts() {
   const [chartKind, setChartKind] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [data, setData] = useState<ISensor[]>([]);
 
   const { isConnected, disconnect, connect } = useSensors({
-    onMessage: (data, id) => {
-      if (Math.random() > 0.05) return;
-      setData((prev) => [...prev, generateSensorEntry(id!, data)]);
-    },
+    onMessage: (data) => setData((prev) => [...prev, data]),
   });
 
   function renderChart() {

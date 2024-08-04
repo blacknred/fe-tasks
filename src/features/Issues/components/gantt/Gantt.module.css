@@ -1,0 +1,68 @@
+.list {
+  list-style: none;
+  padding: 0;
+
+  & > li {
+    background-color: #f5f5f5;
+    padding: 10px;
+    margin: 5px;
+    height: 55px;
+    display: flex;
+  }
+}
+
+.bar {
+  height: 100%;
+  background-color: rgb(174, 184, 194);
+  position: relative;
+  border-radius: 5px;
+  cursor: pointer;
+
+  & > div {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  & > h4 {
+    text-align: center;
+    font-family: monospace;
+    position: absolute;
+    transform: translateY(-50%);
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    top: 50%;
+    left: 20px;
+    right: 20px;
+    margin: 0;
+  }
+}
+
+.slider {
+  width: 5px;
+  margin: 2px;
+  border-radius: 5px;
+  z-index: 1;
+  cursor: ew-resize;
+  background-color: white;
+}
+
+.progress {
+  flex: 1;
+  background-color: rgb(163, 163, 255);
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+
+  & > span {
+    color: white;
+    position: absolute;
+    cursor: ew-resize;
+    font-size: small;
+    bottom: -4px;
+    right: -6px;
+  }
+}
