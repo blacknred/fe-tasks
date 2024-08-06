@@ -11,7 +11,7 @@ export const useSensors = (options: Pick<Options<ISensor>, "onMessage">) =>
     type: "sse",
     ...options,
     onMessage: (data, id) => {
-      if (Math.random() > 0.05) return;
+      if (Math.random() > 0.06) return;
       options.onMessage?.(generateSensorEntry(id!, data as unknown as string));
     },
   });
