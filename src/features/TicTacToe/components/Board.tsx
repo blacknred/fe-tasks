@@ -7,14 +7,13 @@ import {
 } from "react";
 import { IBoard } from "../types";
 import { getRandomEmptyIndex } from "../utils";
-import { useDnD } from "../../../hooks/useDnD";
 
 type BoardProps = { capacity: number; onCheck: (board: IBoard) => void };
 
 export const Board = forwardRef(({ capacity, onCheck }: BoardProps, ref) => {
   const [board, setBoard] = useState<IBoard>(() => Array(capacity).fill(null));
   const stepHistory = useRef<[number, IBoard[0]][]>([]);
-  const [draggable, dropZone] = useDnD();
+  const n = Math.sqrt(capacity);
 
   useImperativeHandle(ref, () => ({
     onUndo: () => {
@@ -44,11 +43,14 @@ export const Board = forwardRef(({ capacity, onCheck }: BoardProps, ref) => {
 
   return (
     <>
-      <div>
+      <div
+        style={{
+          gridTemplate: `repeat(${n}, 3em) / repeat(${n}, 3em)`,
+        }}
+      >
         {board.map((value, idx) => (
           <button
             key={idx}
-            ref={idx === board.length - 1 ? draggable : null}
             disabled={!!value}
             onClick={() => {
               stepHistory.current.unshift([idx, "X"]);
@@ -69,10 +71,6 @@ export const Board = forwardRef(({ capacity, onCheck }: BoardProps, ref) => {
           </li>
         ))}
       </ul>
-      <div
-        ref={dropZone}
-        style={{ backgroundColor: "saddlebrown", width: 200, height: 200 }}
-      ></div>
     </>
   );
 });

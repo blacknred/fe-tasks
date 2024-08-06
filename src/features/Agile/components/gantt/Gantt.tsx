@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, memo } from "react";
+import { useRef, useState, useCallback, memo, Fragment } from "react";
 import { useMouseMove } from "../../../../hooks/useMouseMove";
 import styles from "./Gantt.module.css";
 
@@ -19,8 +19,42 @@ const epics = [
   },
 ];
 
+const items = Array(8).fill(0);
+const colls = Array(365).fill(0);
+
 export function Gantt() {
-  return <p>Gantt</p>;
+  return (
+    <div className={styles.grid}>
+      <ul>
+        <li>Epics</li>
+        {items.map((item, idx) => (
+          <li key={idx}>{idx + 1}</li>
+        ))}
+      </ul>
+
+      <div
+        style={{
+          gridTemplate: `repeat(${items.length + 1}, 3em) / repeat(${
+            colls.length
+          }, 4em)`,
+        }}
+      >
+        {/* header */}
+        {colls.map((_, idx) => (
+          <div key={idx} style={{ backgroundColor: "#f5f5f5" }}>
+            {idx + 1}d
+          </div>
+        ))}
+        {/* content */}
+        {items.map((_, idx) => {
+          const backgroundColor = idx % 2 ? "#f5f5f5" : "default";
+          return colls.map((_, i) => (
+            <div key={i} style={{ backgroundColor }}></div>
+          ));
+        })}
+      </div>
+    </div>
+  );
   //   return (
   //     <ul className={styles.list}>
   //       {epics.map((epic) => (

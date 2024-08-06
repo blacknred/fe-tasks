@@ -9,6 +9,7 @@ export type BoardProps = {
 
 export const Board = memo(({ capacity, level = 1, setScore }: BoardProps) => {
   const [position, setPosition] = useState<number | null>(null);
+  const n = Math.sqrt(capacity);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -20,7 +21,12 @@ export const Board = memo(({ capacity, level = 1, setScore }: BoardProps) => {
   }, [level]);
 
   return (
-    <div className={styles.grid}>
+    <div
+      className={styles.grid}
+      style={{
+        gridTemplate: `repeat(${n}, 3em) / repeat(${n}, 3em)`,
+      }}
+    >
       {Array(capacity)
         .fill(0)
         .map((_, idx) => (

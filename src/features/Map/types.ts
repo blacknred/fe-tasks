@@ -10,8 +10,8 @@ export type IPlanePosition = {
 };
 
 export type IPositionBoundaries = {
-  bl_lat: number;
-  bl_lng: number;
-  tr_lat: number;
-  tr_lng: number;
+  bl_lat: string;
+  bl_lng: string;
+  tr_lat: string;
+  tr_lng: string;
 };

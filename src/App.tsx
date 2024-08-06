@@ -23,10 +23,12 @@ function Header() {
           <Link path="/charts">Charts</Link>
         </li>
         <li>
-          <Link path="/map">Map</Link>
+          <Link path="/map?bl_lat=49.699472&tr_lat=55.357133&bl_lng=-6.898218&tr_lng=1.231665">
+            Map
+          </Link>
         </li>
         <li>
-          <Link path="/issues">Issues</Link>
+          <Link path="/agile">Agile</Link>
         </li>
         <li>
           <Link path="/tic-tac-toe">TicTacToe</Link>

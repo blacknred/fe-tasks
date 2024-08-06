@@ -1,15 +1,14 @@
 import { Suspense, lazy } from "react";
-import Charts from "./features/Charts";
-// import Comments from "./features/Comments";
-import Countdown from "./features/Countdown";
-import Issues from "./features/Issues";
-import Map from "./features/Map";
-import { ReactOrder } from "./features/ReactOrder/ReactOrder";
-import TicTacToe from "./features/TicTacToe";
-import WhackAMolly from "./features/WhackAMolly";
 import { Route, Router } from "./lib/router";
 
-const Comments = lazy(() => import('./features/Comments'));
+const Comments = lazy(() => import("./features/Comments"));
+const Charts = lazy(() => import("./features/Charts"));
+const Countdown = lazy(() => import("./features/Countdown"));
+const Map = lazy(() => import("./features/Map"));
+const TicTacToe = lazy(() => import("./features/TicTacToe"));
+const WhackAMolly = lazy(() => import("./features/WhackAMolly"));
+const ReactOrder = lazy(() => import("./features/ReactOrder"));
+const Agile = lazy(() => import("./features/Agile"));
 
 export default function AppRoutes() {
   return (
@@ -18,20 +17,8 @@ export default function AppRoutes() {
         <Route path="/countdown" element={<Countdown />} />
         <Route path="/comments" element={<Comments />} />
         <Route path="/charts" element={<Charts />} />
-        <Route
-          path="/map"
-          element={
-            <Map
-              boundaries={{
-                bl_lat: 49.699472,
-                tr_lat: 55.357133,
-                bl_lng: -6.898218,
-                tr_lng: 1.231665,
-              }}
-            />
-          }
-        />
-        <Route path="/issues" element={<Issues />} />
+        <Route path="/map" element={<Map />} />
+        <Route path="/agile" element={<Agile />} />
         <Route path="/tic-tac-toe" element={<TicTacToe />} />
         <Route path="/whack-a-molly" element={<WhackAMolly />} />
         <Route path="/snake" element={<div />} />

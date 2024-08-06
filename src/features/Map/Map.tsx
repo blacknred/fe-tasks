@@ -5,19 +5,22 @@ import {
   MapContainer,
   TileLayer,
 } from "react-leaflet";
+import { useParams } from "../../lib/router";
 import styles from "./Map.module.css";
 import { usePlanes } from "./api";
 import { Markers } from "./components/Markers";
 import { IPlane, IPlanePosition, IPositionBoundaries } from "./types";
 import { findCenterFromBoundaries } from "./utils";
 
-export type MapProps = {
-  boundaries: IPositionBoundaries;
-};
-
-export function Map({ boundaries }: MapProps) {
+export function Map() {
   const [planes, _, isFetching] = usePlanes();
   const [selectedCode, setSelectedCode] = useState<IPlane["code"]>();
+
+  const params = useParams();
+  const boundaries: IPositionBoundaries = useMemo(() => {
+    const { bl_lat, bl_lng, tr_lat, tr_lng } = params;
+    return { bl_lat, bl_lng, tr_lat, tr_lng };
+  }, [params]);
 
   const center = useMemo(
     () => findCenterFromBoundaries(boundaries),
