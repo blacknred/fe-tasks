@@ -1,174 +1,136 @@
-export function Board() {
-  return <p>Board</p>;
+import { Fragment, useState, useMemo } from "react";
+import { useDrag, useDrop } from "./useDnd";
+import { getTasks, prepareTasksForBoard, STATUSSES } from "./util";
+import styles from "./Board.module.css";
+import { flushSync } from "react-dom";
+
+function DropArea({ onDrop, id }) {
+  const droppable = useDrop(onDrop, styles.drop);
+
+  return <li className={styles.dropArea} ref={droppable} id={id} />;
 }
 
-// import { useState } from "react";
-// import { useDrag, useDrop } from "./useDnd";
-// import { getTasks, STATUSSES } from "./util";
+function Card({ id, title, boardOrder }) {
+  const draggable = useDrag(null, styles.drag);
 
-// function Card({ data }) {
-//   const draggable = useDrag();
+  return (
+    <li id={id} ref={draggable} className={styles.card}>
+      <div style={{ padding: `${title[0] * 10}px 0px` }}>
+        {title}---[{id}]-[{boardOrder}]
+      </div>
+    </li>
+  );
+}
 
-//   return (
-//     <li
-//       id={data.id}
-//       ref={draggable}
-//       style={{
-//         padding: 30,
-//         border: "1px solid #bbb",
-//         marginBottom: 10,
-//         cursor: "pointer",
-//         backgroundColor: "lightyellow",
-//       }}
-//     >
-//       {data.title}---[{data.id}]-[{data.boardOrder}]
-//     </li>
-//   );
-// }
+function Column({ onRemove, cards, title, onCardReposition, editable }) {
+  const draggable = useDrag(null, editable ? styles.drag : "");
 
-// function CardList({ name, tasks, setTasks }) {
-//   const dropZone = useDrop((dragElId, dropElId) => {
-//     if (dragElId === dropElId) return;
-//     setTasks((prev) => {
-//       const idx = prev.findIndex((p) => p.id == dragElId);
-//       prev[idx].status = name;
+  return (
+    <div ref={draggable} id={title} className={styles.column}>
+      <div>
+        <p>
+          {title.toUpperCase()}: {cards.length}
+        </p>
+        {!!editable && <span onClick={onRemove}>x</span>}
+      </div>
+      <ul>
+        <DropArea id={0} onDrop={onCardReposition} disabled={editable} />
+        {cards.map((card, idx) => (
+          <Fragment key={card.id}>
+            <Card {...card} />
+            <DropArea
+              id={idx + 1}
+              onDrop={onCardReposition}
+              disabled={editable}
+            />
+          </Fragment>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
-//       if (dropElId !== name) {
-//         console.log(66);
-//         const replacedTaskIdx = prev.findIndex((p) => p.id == dropElId);
-//         const replacedBoardOrder = prev[replacedTaskIdx].boardOrder;
+export default function Board() {
+  const [columns, setColumns] = useState(STATUSSES.slice(0, 3));
+  const [tasks, setTasks] = useState(() => getTasks(10));
 
-//         // swap boardOrder with replaced task
-//         prev[idx].boardOrder = replacedBoardOrder;
-//         prev[replacedTaskIdx].boardOrder = replacedBoardOrder + 1;
+  const [isColumnsEditable, setIsColumnsEditable] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-//         // enlarge boardOrder for all tasks after replaced for order consistency
-//         tasks.forEach((t) => {
-//           if (t.boardOrder < replacedBoardOrder) return;
-//           const i = prev.findIndex((p) => p.id == t.id);
-//           prev[i].boardOrder = prev[i].boardOrder + 1;
-//         });
-//       }
+  const cards = useMemo(() => {
+    const data = tasks.filter(
+      (t) => !searchText || t.title.includes(searchText)
+    );
+    return prepareTasksForBoard(data);
+  }, [tasks, searchText]);
 
-//       return [...prev];
-//     });
-//   }, "act");
+  const handleColumnReposition = (column, newIndex) => {
+    setColumns((prev) => {
+      prev.splice(prev.indexOf(column), 1);
+      const head = prev.slice(0, newIndex);
+      const tail = prev.slice(newIndex, prev.length);
+      console.log(head, tail, [...head, column, ...tail]);
+      return [...head, column, ...tail];
+    });
+  };
 
-//   return (
-//     <ul
-//       ref={dropZone}
-//       id={name}
-//       style={{
-//         padding: 10,
-//         margin: 0,
-//         flex: 1,
-//         listStyle: "none",
-//       }}
-//     >
-//       {tasks.map((task) => (
-//         <Card key={task.id} data={task} />
-//       ))}
-//     </ul>
-//   );
-// }
+  const handleCardReposition = (newStatus) => (taskId, newIndex) => {
+    console.log("card reposition", newStatus, taskId, newIndex);
+    // smooth dom updates
+    document.startViewTransition(() => {
+      // sync update
+      flushSync(() =>
+        setTasks((prev) => {
+          const idx = prev.findIndex((t) => t.id == taskId);
+          prev[idx].status = newStatus;
+          prev[idx].boardOrder = newIndex;
+          console.log(idx, prev);
+          return [...prev];
+        })
+      );
+    });
+  };
 
-// function Column(props) {
-//   const draggable = useDrag();
+  if (!tasks) return "...Loading";
 
-//   return (
-//     <div
-//       ref={draggable}
-//       id={props.name}
-//       style={{
-//         flex: 1,
-//         border: "1px solid #aaaaaa",
-//         display: "flex",
-//         flexDirection: "column",
-//       }}
-//     >
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//           cursor: "pointer",
-//         }}
-//       >
-//         <p>
-//           {props.name.toUpperCase()}: {props.tasks.length}
-//         </p>
-//         <span
-//           onClick={() =>
-//             props.setColumns((prev) => prev.filter((p) => p !== name))
-//           }
-//         >
-//           x
-//         </span>
-//       </div>
-//       <CardList {...props} />
-//     </div>
-//   );
-// }
+  return (
+    <>
+      <header className={styles.header}>
+        <input onChange={(e) => setSearchText(e.target.value)}></input>
+        <button onClick={() => setIsColumnsEditable((prev) => !prev)}>
+          <span>&#9881;</span>
+        </button>
+      </header>
+      <br />
+      <main className={styles.grid}>
+        <DropArea id={0} onDrop={handleColumnReposition} />
 
-// export default function Board() {
-//   const [columns, setColumns] = useState(STATUSSES.slice(0, 3));
-//   const [tasks, setTasks] = useState(() => getTasks(10));
-//   const dropZone = useDrop((dragElId, dropElId) => {
-//     console.log(777, dragElId, dropElId);
-//     // setTasks((prev) => {
-//     //   const idx = prev.findIndex((p) => p.id == dragElId);
-//     //   prev[idx].status = name;
-//     //   if (dropElId !== name) {
-//     //     console.log(66);
-//     //     const i = prev.findIndex((p) => p.id == dropElId);
-//     //     prev[idx].boardOrder = prev[i].boardOrder;
-//     //     prev[i].boardOrder = prev[i].boardOrder + 1;
-//     //   }
-//     //   return [...prev];
-//     // });
-//   }, "act");
+        {columns.map((column, idx) => (
+          <Fragment key={column}>
+            <Column
+              key={column}
+              title={column}
+              cards={cards[column]}
+              editable={isColumnsEditable}
+              onCardReposition={handleCardReposition(column)}
+              onRemove={() => setColumns(columns.filter((c) => c !== column))}
+            />
 
-//   return (
-//     <div
-//       className="App"
-//       style={{ display: "flex", gap: "1rem" }}
-//       ref={dropZone}
-//     >
-//       {columns.map((column) => (
-//         <Column
-//           key={column}
-//           name={column}
-//           setTasks={setTasks}
-//           tasks={tasks
-//             .filter((t) => t.status === column)
-//             .sort((a, b) => a.boardOrder - b.boardOrder)}
-//           setColumns={setColumns}
-//         />
-//       ))}
-//       <ul
-//         style={{
-//           listStyle: "none",
-//           display: "flex",
-//           gap: 10,
-//           flexDirection: "column",
-//           cursor: "pointer",
-//           padding: 0,
-//         }}
-//       >
-//         {STATUSSES.filter((s) => !columns.includes(s)).map((s) => (
-//           <li
-//             key={s}
-//             style={{
-//               border: "1px solid #aaaaaa",
-//               writingMode: "vertical-lr",
-//               padding: 10,
-//             }}
-//             onClick={() => setColumns((prev) => [...prev, s])}
-//           >
-//             {s.toUpperCase()}
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
+            <DropArea id={idx + 1} onDrop={handleColumnReposition} />
+          </Fragment>
+        ))}
+        <div>
+          <ul>
+            {isColumnsEditable
+              ? STATUSSES.filter((s) => !columns.includes(s)).map((s) => (
+                  <li key={s} onClick={() => setColumns([...columns, s])}>
+                    {s.toUpperCase()}
+                  </li>
+                ))
+              : null}
+          </ul>
+        </div>
+      </main>
+    </>
+  );
+}

@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 
-export function useMouseMove(onMove?: (ev: MouseEvent) => void) {
-  const el = useRef<HTMLElement>();
+export function useMove(onMove?: (ev: MouseEvent) => void) {
+  const ref = useRef<HTMLElement>();
+  const memoizedCallback = useRef(onMove);
 
   useEffect(() => {
     let isActive = false;
@@ -17,19 +18,19 @@ export function useMouseMove(onMove?: (ev: MouseEvent) => void) {
     function mouseMove(ev: MouseEvent) {
       ev.stopPropagation();
       if (!isActive) return;
-      onMove?.(ev);
+      memoizedCallback.current?.(ev);
     }
 
-    el.current?.addEventListener("mousedown", mouseDown);
+    ref.current?.addEventListener("mousedown", mouseDown);
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);
 
     return () => {
-      el.current?.removeEventListener("mousedown", mouseDown);
+      ref.current?.removeEventListener("mousedown", mouseDown);
       document.removeEventListener("mousemove", mouseMove);
       document.removeEventListener("mouseup", mouseUp);
     };
   }, []);
 
-  return el;
+  return ref;
 }

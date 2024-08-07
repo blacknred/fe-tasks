@@ -1,0 +1,92 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+}
+
+.grid {
+  display: flex;
+
+  & > div:last-of-type {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+
+    & > ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 0px;
+      margin: 0px;
+
+      & > li {
+        border: 1px solid #aaa;
+        writing-mode: vertical-lr;
+        padding: 10px;
+      }
+    }
+  }
+}
+
+.column {
+  width: 250px;
+  background-color: #eee;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0 8px;
+
+  & > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 5px;
+
+    & > p {
+      cursor: grab;
+    }
+  }
+
+  & > ul {
+    padding: 0px;
+    margin: 0px;
+    flex: 1px;
+    list-style: none;
+  }
+}
+
+.card {
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  background-color: #777;
+}
+
+.dropArea {
+  min-height: 10px;
+  border-radius: 5px;
+  opacity: 0;
+  background-color: #777;
+  transition: padding 0.2s linear, opacity 0.2s linear;
+}
+
+.drop {
+  padding: 13% !important;
+  opacity: 0.3 !important;
+  will-change: padding, opacity;
+
+  ul:has(&) {
+    /* background-color: #ccc; */
+  }
+}
+
+.drag {
+  &:active {
+    opacity: 0.1;
+    cursor: grab;
+  }
+}

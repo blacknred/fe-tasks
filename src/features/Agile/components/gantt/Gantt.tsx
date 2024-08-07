@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, memo, Fragment } from "react";
-import { useMouseMove } from "../../../../hooks/useMouseMove";
+import { useMouseMove } from "../../../../hooks/useMove";
 import styles from "./Gantt.module.css";
 
 const epics = [

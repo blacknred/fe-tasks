@@ -31,7 +31,7 @@ function Third() {
   console.log(7);
   useEffect(() => console.log(8), []);
   useLayoutEffect(() => console.log(9), []);
-  return <img src={code} />;
+  return <img src={code} loading='lazy' />;
 }
 
 export function ReactOrder() {

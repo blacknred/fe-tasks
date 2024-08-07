@@ -1,2 +1,3 @@
-# confident-thunder
-Created with CodeSandbox
+# React tasks
+
+> Tasks examples

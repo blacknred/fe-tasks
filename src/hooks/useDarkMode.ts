@@ -22,7 +22,7 @@ export function useDarkMode(target = document.documentElement) {
 
     switcher.current?.addEventListener("change", handler);
     return () => switcher.current?.removeEventListener("change", handler);
-  }, []);
+  }, [target]);
 
   return switcher;
 }
