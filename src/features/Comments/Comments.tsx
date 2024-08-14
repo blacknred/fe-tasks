@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./Comments.module.css";
-import { useComments } from "./api";
+import { useComments } from "./api/getComments";
 import { CommentList } from "./components/CommentList";
 import { Paginated } from "./components/Paginated";
 import { transformComments } from "./utils";

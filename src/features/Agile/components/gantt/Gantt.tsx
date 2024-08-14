@@ -1,28 +1,37 @@
-import { useRef, useState, useCallback, memo, Fragment } from "react";
-import { useMouseMove } from "../../../../hooks/useMove";
+import { useEpics } from "../../api/getEpics";
+import { useSprints } from "../../api/getSprints";
 import styles from "./Gantt.module.css";
 
-const epics = [
-  {
-    name: "First epic",
-    start: 10,
-    end: 360,
-    stories: [
-      { name: "A new Story", start: 70, end: 290, progress: 10 },
-      {
-        name: "An old Story without context",
-        start: 30,
-        end: 160,
-        progress: 63,
-      },
-    ],
-  },
-];
+// const epics = [
+//   {
+//     name: "First epic",
+//     start: 10,
+//     end: 360,
+//     stories: [
+//       { name: "A new Story", start: 70, end: 290, progress: 10 },
+//       {
+//         name: "An old Story without context",
+//         start: 30,
+//         end: 160,
+//         progress: 63,
+//       },
+//     ],
+//   },
+// ];
 
 const items = Array(8).fill(0);
 const colls = Array(365).fill(0);
 
-export function Gantt() {
+export type GanttProps = {
+  projectId: string;
+};
+
+export function Gantt({ projectId }: GanttProps) {
+  const [sprints] = useSprints(projectId);
+  const [epics] = useEpics(projectId);
+  console.table(sprints)
+  console.table(epics)
+
   return (
     <div className={styles.grid}>
       <ul>
@@ -34,9 +43,8 @@ export function Gantt() {
 
       <div
         style={{
-          gridTemplate: `repeat(${items.length + 1}, 3em) / repeat(${
-            colls.length
-          }, 4em)`,
+          gridTemplate: `repeat(${items.length + 1}, 3em) / repeat(${colls.length
+            }, 4em)`,
         }}
       >
         {/* header */}

@@ -1,6 +1,6 @@
-import useSubscription, { Options } from "../../hooks/useSubscription";
-import { ISensor } from "./types";
-import { generateSensorEntry } from "./utils";
+import useSubscription, { Options } from "../../../hooks/useSubscription";
+import { ISensor } from "../types";
+import { generateSensorEntry } from "../utils";
 
 const HOST = "https://echo.websocket.org/.sse";
 

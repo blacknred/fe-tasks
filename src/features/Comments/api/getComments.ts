@@ -1,5 +1,5 @@
-import useQuery from "../../hooks/useQuery";
-import type { IComment } from "./types";
+import useQuery from "../../../hooks/useQuery";
+import type { IComment } from "../types";
 
 const HOST = "https://jsonplaceholder.typicode.com/comments";
 

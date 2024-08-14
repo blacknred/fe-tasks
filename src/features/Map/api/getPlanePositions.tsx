@@ -1,8 +1,7 @@
 import { useRef } from "react";
-import useQuery from "../../hooks/useQuery";
-import useSubscription from "../../hooks/useSubscription";
-import { IPlane, IPlanePosition, IPositionBoundaries } from "./types";
-import { PLANECODES, planePositionGenerator } from "./utils";
+import useSubscription from "../../../hooks/useSubscription";
+import { IPlanePosition, IPositionBoundaries } from "../types";
+import { planePositionGenerator } from "../utils";
 
 const HOST = "https://echo.websocket.org/.ws";
 
@@ -30,6 +29,3 @@ export const usePlanePositions = (boundaries: IPositionBoundaries) => {
 
   return subscription;
 };
-
-export const usePlanes = () =>
-  useQuery<IPlane[]>("", { fallback: PLANECODES.map((code) => ({ code })) });

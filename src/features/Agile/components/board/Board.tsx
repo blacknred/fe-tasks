@@ -1,63 +1,29 @@
 import { Fragment, useState, useMemo } from "react";
-import { useDrag, useDrop } from "./useDnd";
-import { getTasks, prepareTasksForBoard, STATUSSES } from "./util";
 import styles from "./Board.module.css";
 import { flushSync } from "react-dom";
+import { useSprintTasks } from "../../api/getTasks";
+import { useStatusses } from "../../api/getStatusses";
+import { useBoards } from "../../api/getBoards";
+import { DropArea } from "./DropArea";
+import { Column } from "./Column";
 
-function DropArea({ onDrop, id }) {
-  const droppable = useDrop(onDrop, styles.drop);
+export type BoardProps = {
+  projectId: string;
+};
 
-  return <li className={styles.dropArea} ref={droppable} id={id} />;
-}
+export default function Board({ projectId }: BoardProps) {
+  const [boards] = useBoards(projectId);
 
-function Card({ id, title, boardOrder }) {
-  const draggable = useDrag(null, styles.drag);
+  const [tasks, _, isPending, refetch] = useSprintTasks(projectId, '1');
+  console.table(tasks);
 
-  return (
-    <li id={id} ref={draggable} className={styles.card}>
-      <div style={{ padding: `${title[0] * 10}px 0px` }}>
-        {title}---[{id}]-[{boardOrder}]
-      </div>
-    </li>
-  );
-}
-
-function Column({ onRemove, cards, title, onCardReposition, editable }) {
-  const draggable = useDrag(null, editable ? styles.drag : "");
-
-  return (
-    <div ref={draggable} id={title} className={styles.column}>
-      <div>
-        <p>
-          {title.toUpperCase()}: {cards.length}
-        </p>
-        {!!editable && <span onClick={onRemove}>x</span>}
-      </div>
-      <ul>
-        <DropArea id={0} onDrop={onCardReposition} disabled={editable} />
-        {cards.map((card, idx) => (
-          <Fragment key={card.id}>
-            <Card {...card} />
-            <DropArea
-              id={idx + 1}
-              onDrop={onCardReposition}
-              disabled={editable}
-            />
-          </Fragment>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default function Board() {
-  const [columns, setColumns] = useState(STATUSSES.slice(0, 3));
-  const [tasks, setTasks] = useState(() => getTasks(10));
-
+  const [statusses] = useStatusses(projectId);
+  // const [columns, setColumns] = useState(STATUSSES.slice(0, 3));
   const [isColumnsEditable, setIsColumnsEditable] = useState(false);
   const [searchText, setSearchText] = useState("");
 
   const cards = useMemo(() => {
+    if (!tasks) return [];
     const data = tasks.filter(
       (t) => !searchText || t.title.includes(searchText)
     );
@@ -102,17 +68,17 @@ export default function Board() {
         </button>
       </header>
       <br />
+      
       <main className={styles.grid}>
         <DropArea id={0} onDrop={handleColumnReposition} />
 
-        {columns.map((column, idx) => (
-          <Fragment key={column}>
+        {boards?.[0].columns.map((column, idx) => (
+          <Fragment key={column.name}>
             <Column
-              key={column}
-              title={column}
+              title={column.name}
               cards={cards[column]}
               editable={isColumnsEditable}
-              onCardReposition={handleCardReposition(column)}
+              onCardReposition={handleCardReposition(column.status)}
               onRemove={() => setColumns(columns.filter((c) => c !== column))}
             />
 
@@ -122,11 +88,11 @@ export default function Board() {
         <div>
           <ul>
             {isColumnsEditable
-              ? STATUSSES.filter((s) => !columns.includes(s)).map((s) => (
-                  <li key={s} onClick={() => setColumns([...columns, s])}>
-                    {s.toUpperCase()}
-                  </li>
-                ))
+              ? statusses?.filter((s) => !columns.includes(s)).map((s) => (
+                <li key={s} onClick={() => setColumns([...columns, s])}>
+                  {s.toUpperCase()}
+                </li>
+              ))
               : null}
           </ul>
         </div>

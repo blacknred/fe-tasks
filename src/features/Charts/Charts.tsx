@@ -19,7 +19,7 @@ import {
   YAxis,
 } from "recharts";
 import styles from "./Charts.module.css";
-import { useSensors } from "./api";
+import { useSensors } from "./api/getSensors";
 import type { ISensor } from "./types";
 
 export function Charts() {

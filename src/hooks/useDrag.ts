@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export function useDrag(onDrag?: () => void, activeClass = "") {
-  const draggable = useRef<HTMLElement>();
+  const draggable = useRef<HTMLElement | null>(null);
   const memoizedCallback = useRef(onDrag);
 
   useEffect(() => {

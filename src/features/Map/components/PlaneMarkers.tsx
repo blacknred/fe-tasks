@@ -7,9 +7,9 @@ import {
   useImperativeHandle,
 } from "react";
 import { Marker, Tooltip } from "react-leaflet";
-import { usePlanePositions } from "../api";
-import { IPlane, IPositionBoundaries } from "../types";
+import { usePlanePositions } from "../api/getPlanePositions";
 import icon from "../assets/plane.png";
+import { IPlane, IPositionBoundaries } from "../types";
 
 const planeIcon = L.icon({
   iconUrl: icon,
@@ -17,14 +17,14 @@ const planeIcon = L.icon({
   className: "",
 });
 
-export type MarkersProps = {
+export type PlaneMarkersProps = {
   boundaries: IPositionBoundaries;
   selectedCode?: IPlane["code"];
-  setSelectedCode: Dispatch<SetStateAction<IPlane["code"] | undefined>>;
+  onCodeSelected: Dispatch<SetStateAction<IPlane["code"] | undefined>>;
 };
 
-export const Markers = forwardRef(
-  ({ boundaries, selectedCode, setSelectedCode }: MarkersProps, ref) => {
+export const PlaneMarkers = forwardRef<unknown, PlaneMarkersProps>(
+  ({ boundaries, selectedCode, onCodeSelected }, ref) => {
     const { lastMessage } = usePlanePositions(boundaries);
 
     useImperativeHandle(ref, () => ({
@@ -40,7 +40,7 @@ export const Markers = forwardRef(
             position={position}
             icon={planeIcon}
             eventHandlers={{
-              click: () => setSelectedCode(code),
+              click: () => onCodeSelected(code),
             }}
           >
             {selectedCode === code && (

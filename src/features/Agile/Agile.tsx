@@ -3,8 +3,10 @@ import styles from "./Agile.module.css";
 import { Gantt } from "./components/gantt/Gantt";
 import { Backlog } from "./components/backlog/Backlog";
 import { Board } from "./components/board/Board";
+import { useParams } from "../../lib/router";
 
 export function Agile() {
+  const { projectId } = useParams();
   const [viewKind, setViewKind] = useState<1 | 2 | 3>(1);
 
   return (
@@ -18,9 +20,9 @@ export function Agile() {
       </header>
       <br />
       <main className={styles.main}>
-        {viewKind === 1 && <Gantt />}
-        {viewKind === 2 && <Board />}
-        {viewKind === 3 && <Backlog />}
+        {viewKind === 1 && <Gantt projectId={projectId} />}
+        {viewKind === 2 && <Board projectId={projectId} />}
+        {viewKind === 3 && <Backlog projectId={projectId} />}
       </main>
     </>
   );

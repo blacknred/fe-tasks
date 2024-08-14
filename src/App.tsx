@@ -28,7 +28,7 @@ function Header() {
           </Link>
         </li>
         <li>
-          <Link path="/agile">Agile</Link>
+          <Link path="/agile?projectId=1">Agile</Link>
         </li>
         <li>
           <Link path="/tic-tac-toe">TicTacToe</Link>

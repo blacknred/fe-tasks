@@ -7,37 +7,34 @@ import {
 } from "react-leaflet";
 import { useParams } from "../../lib/router";
 import styles from "./Map.module.css";
-import { usePlanes } from "./api";
-import { Markers } from "./components/Markers";
+import { usePlanes } from "./api/getPlanes";
+import { PlaneMarkers } from "./components/PlaneMarkers";
 import { IPlane, IPlanePosition, IPositionBoundaries } from "./types";
 import { findCenterFromBoundaries } from "./utils";
+import { PlaneList } from "./components/PlaneList";
 
 export function Map() {
-  const [planes, _, isFetching] = usePlanes();
-  const [selectedCode, setSelectedCode] = useState<IPlane["code"]>();
-
   const params = useParams();
-  const boundaries: IPositionBoundaries = useMemo(() => {
+  const [boundaries, center] = useMemo(() => {
     const { bl_lat, bl_lng, tr_lat, tr_lng } = params;
-    return { bl_lat, bl_lng, tr_lat, tr_lng };
+    const boundaries = { bl_lat, bl_lng, tr_lat, tr_lng };
+    const center = findCenterFromBoundaries(boundaries);
+    return [boundaries, center] as [IPositionBoundaries, [number, number]];
   }, [params]);
 
-  const center = useMemo(
-    () => findCenterFromBoundaries(boundaries),
-    [boundaries]
-  );
-
+  const mapRef = useRef<L.Map>(null);
   const liRef = useRef<HTMLLIElement | null>();
-  const map = useRef<L.Map>(null);
-  const layersRef = useRef<{
+  const markersRef = useRef<{
     findSelectedPlanePosition: () => IPlanePosition;
   }>();
 
+  const [selectedCode, setSelectedCode] = useState<IPlane["code"]>();
+
   useEffect(() => {
     liRef.current?.scrollIntoView({ behavior: "smooth" });
-    const position = layersRef.current?.findSelectedPlanePosition();
+    const position = markersRef.current?.findSelectedPlanePosition();
     if (!position) return;
-    map.current?.setView([position.lat, position.lng]);
+    mapRef.current?.setView([position.lat, position.lng]);
   }, [selectedCode]);
 
   return (
@@ -47,38 +44,12 @@ export function Map() {
 
       <br />
       <main className={styles.main}>
-        <div>
-          {isFetching ? (
-            <p>Fetching...</p>
-          ) : (
-            <ul>
-              {planes?.map((plane) => (
-                <li
-                  key={plane.code}
-                  className={selectedCode === plane.code ? styles.active : ""}
-                  ref={(el) => {
-                    if (selectedCode === plane.code) liRef.current = el;
-                  }}
-                >
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedCode(plane.code);
-                    }}
-                  >
-                    {plane.code}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <PlaneList selectedCode={selectedCode} onCodeSelected={setSelectedCode} ref={liRef} />
 
         <MapContainer
           center={center}
           zoom={6}
-          ref={map}
+          ref={mapRef}
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >
@@ -89,11 +60,11 @@ export function Map() {
           <LayersControl position="topright">
             <LayersControl.Overlay checked name="Show planes">
               <LayerGroup>
-                <Markers
+                <PlaneMarkers
                   boundaries={boundaries}
                   selectedCode={selectedCode}
-                  setSelectedCode={setSelectedCode}
-                  ref={layersRef}
+                  onCodeSelected={setSelectedCode}
+                  ref={markersRef}
                 />
               </LayerGroup>
             </LayersControl.Overlay>
