@@ -16,8 +16,8 @@ class ExtendedTaskStore extends Observable<typeof initialState> {
   }
 }
 
-export const extendedTaskStore = new ExtendedTaskStore();
 export const taskStore = new Observable(initialState);
+export const extendedTaskStore = new ExtendedTaskStore();
 
 export const useProject = () => useObservable(taskStore);
 export const useProjectName = () =>

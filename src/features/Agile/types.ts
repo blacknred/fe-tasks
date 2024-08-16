@@ -21,9 +21,7 @@ export interface IBoardColumn {
 }
 
 export interface IBoard {
-  id: ID;
   projectId: ID;
-  name: string;
   columns: IBoardColumn[];
   filter?: string;
 }
@@ -62,20 +60,32 @@ export interface IIssue {
   type: IssueType;
   name: string;
   title: string;
-  tags?: string[];
-  status?: IIssueStatus;
-  priority?: IssuePriority;
   assignee?: IUserPreview;
-  points?: number;
-  sprintId?: ID;
-  epicId?: ID;
   startAt?: string;
   endAt?: string;
   progress?: number;
   version?: number;
+  tags?: string[];
+
+  status: IIssueStatus;
+  priority?: IssuePriority;
+  sprintId?: ID;
+  points?: number;
+  epicId?: ID;
 }
 
+export type IEpicIssue = Omit<IIssue, "type" | "priority" | "sprintId"> & {
+  type: IssueType.EPIC;
+};
+
+export type IStoryIssue = Omit<IIssue, "type" | "points" | "epicId"> & {
+  type: IssueType.STORY;
+  points: number;
+  epicId: ID;
+};
+
 export type IIssueFilters = Partial<{
+  search: string;
   type: IssueType;
   priority: IssuePriority;
   tag: string;
@@ -83,16 +93,3 @@ export type IIssueFilters = Partial<{
   epicId: ID;
   sprintId: ID | null;
 }>;
-// /projects
-// /projects/1
-
-// board:
-// 1. current_sprint?, group_by_epics
-// 2. /issues?type=!epic&sprintId=
-// gantt: 1.epic{...,stories}[], 1.sprints[]
-// 1. sprints
-// 2. /issues?type=epic, /issues?type=story&epicId=
-// backlog:filter_by_epics):
-// 1.sprint{current/future}[]
-// 2. /issues?type=!epic&sprint=nill&  free_issue{non_epic}[]
-// 3.issue{current_sprint/board}

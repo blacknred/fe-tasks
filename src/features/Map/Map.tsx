@@ -7,11 +7,10 @@ import {
 } from "react-leaflet";
 import { useParams } from "../../lib/router";
 import styles from "./Map.module.css";
-import { usePlanes } from "./api/getPlanes";
+import { PlaneList } from "./components/PlaneList";
 import { PlaneMarkers } from "./components/PlaneMarkers";
 import { IPlane, IPlanePosition, IPositionBoundaries } from "./types";
 import { findCenterFromBoundaries } from "./utils";
-import { PlaneList } from "./components/PlaneList";
 
 export function Map() {
   const params = useParams();

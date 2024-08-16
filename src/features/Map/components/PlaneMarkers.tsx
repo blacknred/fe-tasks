@@ -30,7 +30,7 @@ export const PlaneMarkers = forwardRef<unknown, PlaneMarkersProps>(
     useImperativeHandle(ref, () => ({
       findSelectedPlanePosition: () =>
         lastMessage?.find((p) => p.code === selectedCode),
-    }));
+    }), []);
 
     return (
       <>

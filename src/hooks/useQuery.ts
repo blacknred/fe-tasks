@@ -57,7 +57,7 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
           break;
         } catch (err) {
           if (!isMounted.current) return;
-          if (!!fallback) setData(fallback);
+          if (fallback !== undefined) setData(fallback);
           onError?.(err as ErrorType);
         } finally {
           attempt++;

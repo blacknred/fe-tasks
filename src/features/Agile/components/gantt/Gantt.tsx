@@ -1,4 +1,4 @@
-import { useEpics } from "../../api/getEpics";
+import { useEpics } from "../../api/getIssues";
 import { useSprints } from "../../api/getSprints";
 import styles from "./Gantt.module.css";
 

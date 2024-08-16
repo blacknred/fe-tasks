@@ -1,5 +1,5 @@
-import { useDrop } from "../../../../hooks/useDrop";
-import styles from './Board.module.css';
+import { useDrop } from "../../../hooks/useDrop";
+import styles from './Backlog.module.css';
 
 type DropAreaProps = {
   onDrop: (draggableId: string, droppableId: string) => void;
@@ -11,5 +11,5 @@ export function DropArea({ onDrop, id, disabled }: DropAreaProps) {
   const droppable = useDrop(onDrop, styles.drop);
 
   // @ts-ignore
-  return <li className={styles.dropArea} ref={droppable} id={id} />;
+  return <li className={styles.dropArea} ref={disabled ? null : droppable} id={id} />;
 }

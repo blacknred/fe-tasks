@@ -1,43 +1,56 @@
-import { useEpics } from "../../api/getEpics";
-import { useSprints } from "../../api/getSprints";
-import { useBacklogTasks } from "../../api/getTasks";
+import { useRef } from "react";
+import { IIssue, IIssueFilters } from "../../types";
+import { BacklogSection } from "./BAcklogSection";
+import { Header } from "./Header";
 import { SprintSection } from "./SprintSection";
 
 export type BacklogProps = {
   projectId: string;
 };
 
-export function Backlog({ projectId }: BacklogProps) {
-  const [epics] = useEpics(projectId);
-  const [sprints] = useSprints(projectId);
-  const [tasks, _, isPending, refetch] = useBacklogTasks(projectId);
+export type SectionRef = {
+  filter?: (filter: keyof IIssueFilters, value: string) => void;
+  remove: (draggableIdx: string) => IIssue | undefined;
+  add: (issue: IIssue, droppableIdx: string) => void;
+}
 
-  console.table(epics)
-  console.table(sprints)
-  console.table(tasks)
+export function Backlog({ projectId }: BacklogProps) {
+  const sprintRef = useRef<SectionRef>(null);
+  const backlogRef = useRef<SectionRef>(null);
+
+  const onDrop = (section: 'sprint' | 'backlog') => (draggableId: string, droppableIdx: string) => {
+    let target = section === 'sprint' ? backlogRef : sprintRef;
+    let issue = target.current?.remove(draggableId);
+
+    if (!issue) {
+      target = section === 'sprint' ? sprintRef : backlogRef;
+      issue = target.current?.remove(draggableId);
+    }
+
+    if (!issue) return;
+    target.current?.add(issue, droppableIdx);
+    // TODO: update on be
+  }
 
   return (
     <>
-      <header><h2>Backlog</h2></header>
-
-      <aside>
-        <ul>{epics?.map(epic => <li key={epic.id}>{epic.name}</li>)}
-        </ul>
-      </aside>
-
+      <Header
+        projectId={projectId}
+        onFilterChange={backlogRef.current?.filter}
+        onSprintCreated={console.log}
+      />
+      <br />
       <main>
-        {sprints?.map((sprint) => <SprintSection key={sprint.id} {...sprint} />)}
-
-        <section>
-          <header><h3>Backlog</h3></header>
-          <ul>
-            {tasks?.map((task) => (
-              <article key={task.id}>
-                <p>{task.title}</p>
-              </article>
-            ))}
-          </ul>
-        </section>
+        <SprintSection
+          childRef={sprintRef}
+          projectId={projectId}
+          onDrop={onDrop('backlog')}
+        />
+        <BacklogSection
+          ref={backlogRef}
+          projectId={projectId}
+          onDrop={onDrop('backlog')}
+        />
       </main>
     </>
   )

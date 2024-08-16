@@ -1,12 +1,13 @@
 import { Fragment } from 'react';
 import { useDrag } from '../../../../hooks/useDrag';
+import { IIssue } from '../../types';
+import { DropArea } from '../DropArea';
 import styles from './Board.module.css';
-import { Card, CardProps } from './Card';
-import { DropArea } from './DropArea';
+import { Card } from './Card';
 
 export type ColumnProps = {
   title: string;
-  cards: CardProps[];
+  cards?: IIssue[];
   onRemove: () => void;
   onCardReposition: (taskId: string, newIndex: string) => void;
   editable: boolean;
@@ -20,13 +21,13 @@ export function Column({ onRemove, cards, title, onCardReposition, editable }: C
     <div ref={draggable} id={title} className={styles.column}>
       <div>
         <p>
-          {title.toUpperCase()}: {cards.length}
+          {title.toUpperCase()}: {cards?.length}
         </p>
-        {!!editable && <span onClick={onRemove}>x</span>}
+        {editable && <span onClick={onRemove}>x</span>}
       </div>
       <ul>
         <DropArea id={0} onDrop={onCardReposition} disabled={editable} />
-        {cards.map((card, idx) => (
+        {cards?.map((card, idx) => (
           <Fragment key={card.id}>
             <Card {...card} />
             <DropArea

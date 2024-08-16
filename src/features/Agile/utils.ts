@@ -1,5 +1,6 @@
 import {
   IBoard,
+  IBoardColumn,
   IIssue,
   IIssueFilters,
   ISprint,
@@ -16,11 +17,24 @@ export const STATUSSES = [
   "review",
   "design",
 ];
+
 export const DAY = 1000 * 60 * 60 * 24;
 
 const EPIC_DURATION = 30;
 
-export function generateUserPreviews(length: number): IUserPreview[] {
+export function generateBoard(): IBoard {
+  const statussesCount = Math.floor(Math.random() * STATUSSES.length);
+  return {
+    projectId: "1",
+    columns: STATUSSES.slice(0, statussesCount).map((status) => ({
+      status,
+      name: status.toUpperCase(),
+      issueOrder: {},
+    })),
+  };
+}
+
+export function generateUsers(length: number): IUserPreview[] {
   return Array.from({ length }).map((_, i) => ({
     image: `https://robohash.org/${i}.png/`,
     fullname: `user ${i}`,
@@ -40,44 +54,39 @@ export function generateSprints(length: number): ISprint[] {
   }));
 }
 
-export function generateBoards(length: number): IBoard[] {
-  return Array.from({ length }).map((_, i) => ({
-    id: `${i}`,
-    projectId: "1",
-    name: `Board${i}`,
-    columns: STATUSSES.slice(-1, i).map((status) => ({
-      status,
-      name: status.toUpperCase(),
-      issueOrder: {},
-    })),
-  }));
-}
-
-export const generateIssues = (length: number, isEpic = false): IIssue[] => {
+export const generateIssues = (length: number): IIssue[] => {
   const now = Date.now();
   const priorities = Object.values(IssuePriority);
-  const users = generateUserPreviews(10);
+  const users = generateUsers(10);
 
-  return Array.from({ length }, (_, i) => {
+  return Array.from({ length: Math.max(10, length) }, (_, i) => {
     const random = Math.random();
-    const type = isEpic
-      ? IssueType.EPIC
-      : random > 0.5
-      ? IssueType.STORY
-      : IssueType.TASK;
+    const type =
+      i % 10 === 0
+        ? IssueType.EPIC
+        : i % 3 === 0
+        ? IssueType.STORY
+        : IssueType.TASK;
 
     const issue: IIssue = {
       id: `${type}_${i}`,
       projectId: "1",
       type,
-      name: `PRJ-${isEpic ? i : `${i}${i}`}`,
+      name: `PRJ-${type === IssueType.EPIC ? i : `${i}${i}`}`,
       title: random.toString(36).substr(2),
       tags: [],
       assignee: users[Math.floor(random * users.length)],
       version: 1,
+      status: {
+        name:
+          type === IssueType.EPIC
+            ? STATUSSES[0]
+            : STATUSSES[Math.floor(random * STATUSSES.length)],
+        transitions: STATUSSES,
+      },
     };
 
-    if (isEpic) {
+    if (issue.type === IssueType.EPIC) {
       issue.startAt = new Date(now + i * EPIC_DURATION * DAY).toISOString();
       issue.endAt = new Date(
         now + (i * EPIC_DURATION + EPIC_DURATION) * DAY
@@ -87,16 +96,13 @@ export const generateIssues = (length: number, isEpic = false): IIssue[] => {
       return issue;
     }
 
-    issue.status = {
-      name: STATUSSES[Math.floor(random * STATUSSES.length)],
-      transitions: STATUSSES,
-    };
+    //         boardOrder: Math.random() > 0.5 ? Math.floor(rand * 10) : null,
 
     issue.priority = priorities[Math.floor(random * priorities.length)];
 
     if (random > 0.7) issue.sprintId = "1";
 
-    if (type === IssueType.STORY) {
+    if (issue.type === IssueType.STORY) {
       issue.epicId = Math.floor(random * 5).toString();
       issue.points = 1;
     }
@@ -109,41 +115,43 @@ export function filterIssues(issues: IIssue[], filters: IIssueFilters) {
   const { tag, type, assigneeId, priority, epicId, sprintId } = filters;
   return issues.filter((issue) => {
     if (type && issue.type !== type) return false;
-    if (priority && issue.priority !== priority) return false;
+    if (priority && "priority" in issue && issue.priority !== priority) {
+      return false;
+    }
     if (tag && !issue.tags?.includes(tag)) return false;
     if (assigneeId && issue.assignee?.id !== assigneeId) return false;
-    if (epicId && issue.epicId !== epicId) return false;
-    if (sprintId && issue.sprintId !== sprintId) return false;
-    if (sprintId === null && issue.sprintId) return false;
+    if (epicId && "epicId" in issue && issue.epicId !== epicId) {
+      return false;
+    }
+    if (sprintId && "sprintId" in issue && issue.sprintId !== sprintId) {
+      return false;
+    }
+    if (sprintId === null && "sprintId" in issue && issue.sprintId) {
+      return false;
+    }
     return true;
   });
 }
 
-// /**
-//  *
-//  * @param n
-//  * @param t
-//  * @returns
-//  */
-// export function getTasks(n = 10, t = 3) {
-//   return Array(n)
-//     .fill(0)
-//     .map((_, idx) => {
-//       const rand = Math.random();
-//       return {
-//         id: idx,
-//         status: STATUSSES[Math.floor(rand * STATUSSES.length)],
-//         title: rand.toString(36).substr(2),
-//         boardOrder: Math.random() > 0.5 ? Math.floor(rand * 10) : null,
-//       };
-//     });
-// }
+export function prepareIssuesForBoard(
+  issues: IIssue[],
+  columns: IBoardColumn[]
+) {
+  const grouped: Record<string, IIssue[]> = {};
+  for (let status of STATUSSES) {
+    grouped[status] = issues.filter((i) => (i.status.name = status));
+  }
+  for (let column of columns) {
+    const { status, issueOrder } = column;
+    grouped[status]?.sort((a, b) => issueOrder[a.id] - issueOrder[b.id]);
+  }
+  return grouped;
+}
 
-// export function prepareTasksForBoard(tasks) {
-//   const grouped = Object.groupBy(tasks, (t) => t.status);
-//   for (let status of STATUSSES) {
-//     if (!grouped[status]) grouped[status] = [];
-//     else grouped[status].sort((a, b) => a.boardOrder - b.boardOrder);
-//   }
-//   return grouped;
-// }
+export function findCurrentSprint(sprints: ISprint[]) {
+  const today = new Date();
+  const currentSprint = sprints.find(
+    (s) => new Date(s.startAt) < today && today < new Date(s.endAt)
+  );
+  return currentSprint?.id || "1";
+}
