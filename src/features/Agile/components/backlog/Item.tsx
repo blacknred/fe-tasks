@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useDrag } from "../../../../hooks/useDrag";
 import { IIssue } from "../../types";
-import styles from './Board.module.css';
+import styles from './Backlog.module.css';
 
 export type ItemProps = IIssue;
 

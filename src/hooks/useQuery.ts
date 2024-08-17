@@ -9,7 +9,6 @@ export type Options<DataType, ErrorType> = RequestInit & {
   refetchInterval?: number;
   attempts?: number;
   fallback?: DataType;
-  log?: boolean;
 };
 
 export default function useQuery<DataType = unknown, ErrorType = unknown>(
@@ -31,7 +30,6 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
         refetchInterval,
         attempts = 1,
         fallback,
-        log = false,
         ...init
       } = memoizedOptions.current || {};
 
@@ -55,18 +53,11 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
             setData(interceptor(data));
           } else {
             setData(data as DataType);
-            if (!log) return;
-            if (Array.isArray(data)) {
-              console.table(data);
-            } else {
-              console.log(data);
-            }
           }
           break;
         } catch (err) {
           if (!isMounted.current) return;
           if (fallback !== undefined) setData(fallback);
-          if (log) console.error(err);
           onError?.(err as ErrorType);
         } finally {
           attempt++;

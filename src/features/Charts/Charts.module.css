@@ -1,6 +1,10 @@
 .header {
   display: flex;
   gap: 1rem;
+
+  & > button.active {
+    background-color: yellowgreen;
+  }
 }
 
 .main {

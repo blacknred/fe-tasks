@@ -1,8 +1,8 @@
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 0 1.5rem;
+  gap: 1rem;
 }
 
 .grid {
@@ -32,12 +32,18 @@
 }
 
 .column {
-  width: 250px;
+  width: 100%;
+  min-width: 12rem;
+  max-width: 15rem;
   background-color: #eee;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: max-content;
   padding: 0 8px;
+
+  &[data-disabled="false"] {
+    border: 5px solid #ddd;
+  }
 
   & > div {
     display: flex;
@@ -63,24 +69,66 @@
   border-radius: 5px;
   cursor: pointer;
   color: white;
-  background-color: #777;
-}
+  background-color: #aaa;
+  padding: 0.8rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
 
-.dropArea {
-  min-height: 10px;
-  border-radius: 5px;
-  opacity: 0;
-  background-color: #777;
-  transition: padding 0.2s linear, opacity 0.2s linear;
-}
+  & > div:first-of-type > span {
+    padding: 0.1rem;
+    width: max-content;
+    font-size: small;
 
-.drop {
-  padding: 13% !important;
-  opacity: 0.3 !important;
-  will-change: padding, opacity;
+    &[data-priority="HIGH"] {
+      background-color: coral;
+    }
+    &[data-priority="MEDIUM"] {
+      background-color: orange;
+    }
+    &[data-priority="LOW"] {
+      background-color: green;
+    }
+    &[data-priority="TRIVIAL"] {
+      background-color: grey;
+    }
+    &[data-priority="CRITICAL"] {
+      background-color: red;
+    }
+    &[data-priority="BLOCKER"] {
+      background-color: black;
+    }
+  }
 
-  ul:has(&) {
-    /* background-color: #ccc; */
+  & > div:last-of-type {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & > span {
+      display: flex;
+      gap: 0.5rem;
+
+      & > span:first-of-type {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 5px;
+
+        &[data-type="TASK"] {
+          background-color: green;
+        }
+        &[data-type="STORY"] {
+          background-color: orange;
+        }
+      }
+    }
+
+    & > img {
+      border-radius: 50%;
+      width: 1.5rem;
+      height: 1.5rem;
+      background-color: #fff;
+    }
   }
 }
 

@@ -23,6 +23,55 @@ export const DAY = 1000 * 60 * 60 * 24;
 
 const EPIC_DURATION = 30;
 
+function generateRandomText(
+  paragraphCount: number,
+  sentencesPerParagraphCount: number
+) {
+  const words = [
+    "lorem",
+    "ipsum",
+    "dolor",
+    "sit",
+    "amet",
+    "consectetur",
+    "adipiscing",
+    "elit",
+    "sed",
+    "do",
+    "eiusmod",
+    "tempor",
+    "incididunt",
+    "ut",
+    "labore",
+    "et",
+    "dolore",
+    "magna",
+    "aliqua",
+  ];
+  const paragraphs = [];
+
+  for (let p = 0; p < paragraphCount; p++) {
+    const sentences = [];
+
+    for (let i = 0; i < sentencesPerParagraphCount; i++) {
+      const numWords = Math.floor(Math.random() * 10) + 5;
+      const sentenceWords = [];
+
+      for (let j = 0; j < numWords; j++) {
+        const randomIndex = Math.floor(Math.random() * words.length);
+        sentenceWords.push(words[randomIndex]);
+      }
+
+      const sentence = sentenceWords.join(" ") + ".";
+      sentences.push(sentence.charAt(0).toUpperCase() + sentence.slice(1));
+    }
+
+    paragraphs.push(sentences.join(" "));
+  }
+
+  return paragraphs.join("\n\n");
+}
+
 export function generateStatusses(): IIssueStatus[] {
   return STATUSSES.map((name) => ({
     name,
@@ -31,10 +80,9 @@ export function generateStatusses(): IIssueStatus[] {
 }
 
 export function generateBoard(): IBoard {
-  const statussesCount = Math.floor(Math.random() * STATUSSES.length);
   return {
     projectId: "1",
-    columns: STATUSSES.slice(0, statussesCount).map((status) => ({
+    columns: STATUSSES.slice(0, 3).map((status) => ({
       status,
       name: status.toUpperCase(),
       issueOrder: {},
@@ -54,7 +102,7 @@ export function generateSprints(length: number): ISprint[] {
   const now = Date.now();
 
   return Array.from({ length }).map((_, i) => ({
-    id: `${i}`,
+    id: `${i + 1}`,
     projectId: "1",
     name: `Sprint #${i}`,
     startAt: new Date(now + i * DAY).toISOString(),
@@ -77,18 +125,18 @@ export const generateIssues = (length: number): IIssue[] => {
         : IssueType.TASK;
 
     const issue: IIssue = {
-      id: `${type}_${i}`,
+      id: `${type}_${i + 1}`,
       projectId: "1",
       type,
       name: `PRJ-${type === IssueType.EPIC ? i : `${i}${i}`}`,
-      title: random.toString(36).substr(2),
+      title: generateRandomText(1, 1),
       tags: [],
       assignee: users[Math.floor(random * users.length)],
       version: 1,
       status:
         type === IssueType.EPIC
           ? STATUSSES[0]
-          : STATUSSES[Math.floor(random * STATUSSES.length)],
+          : STATUSSES[Math.floor(Math.random() * 3)],
     };
 
     if (issue.type === IssueType.EPIC) {
@@ -101,11 +149,8 @@ export const generateIssues = (length: number): IIssue[] => {
       return issue;
     }
 
-    // boardOrder: Math.random() > 0.5 ? Math.floor(rand * 10) : null,
-
-    issue.priority = priorities[Math.floor(random * priorities.length)];
-
-    if (random > 0.7) issue.sprintId = "1";
+    issue.priority = priorities[Math.floor(Math.random() * priorities.length)];
+    issue.sprintId = type === IssueType.EPIC || random < 0.7 ? undefined : "1";
 
     if (issue.type === IssueType.STORY) {
       issue.epicId = Math.floor(random * 5).toString();
@@ -117,23 +162,17 @@ export const generateIssues = (length: number): IIssue[] => {
 };
 
 export function filterIssues(issues: IIssue[], filters: IIssueFilters) {
-  const { tag, type, assigneeId, priority, epicId, sprintId } = filters;
+  const { tag, type, assigneeId, priority, epicId, sprintId, search } = filters;
+  console.log(type);
   return issues.filter((issue) => {
+    if (search && !issue.title.includes(search)) return false;
     if (type && issue.type !== type) return false;
-    if (priority && "priority" in issue && issue.priority !== priority) {
-      return false;
-    }
+    if (priority && issue.priority !== priority) return false;
     if (tag && !issue.tags?.includes(tag)) return false;
     if (assigneeId && issue.assignee?.id !== assigneeId) return false;
-    if (epicId && "epicId" in issue && issue.epicId !== epicId) {
-      return false;
-    }
-    if (sprintId && "sprintId" in issue && issue.sprintId !== sprintId) {
-      return false;
-    }
-    if (sprintId === null && "sprintId" in issue && issue.sprintId) {
-      return false;
-    }
+    if (epicId && issue.epicId !== epicId) return false;
+    if (sprintId && issue.sprintId !== sprintId) return false;
+    if (sprintId === null && issue.sprintId) return false;
     return true;
   });
 }
@@ -144,12 +183,14 @@ export function prepareIssuesForBoard(
 ) {
   const grouped: Record<string, IIssue[]> = {};
   for (let status of STATUSSES) {
-    grouped[status] = issues.filter((i) => (i.status = status));
+    grouped[status] = issues.filter((i) => i.status === status);
+    const column = columns.find((c) => c.status === status);
+    if (!column) continue;
+    grouped[status]?.sort(
+      (a, b) => column.issueOrder[a.id] - column.issueOrder[b.id]
+    );
   }
-  for (let column of columns) {
-    const { status, issueOrder } = column;
-    grouped[status]?.sort((a, b) => issueOrder[a.id] - issueOrder[b.id]);
-  }
+
   return grouped;
 }
 

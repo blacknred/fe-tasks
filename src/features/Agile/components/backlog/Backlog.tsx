@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { IIssue, IIssueFilters } from "../../types";
-import { BacklogSection } from "./BAcklogSection";
+import { BacklogSection } from "./BacklogSection";
 import { Header } from "./Header";
 import { SprintSection } from "./SprintSection";
 
@@ -9,7 +9,7 @@ export type BacklogProps = {
 };
 
 export type SectionRef = {
-  filter?: (filter: keyof IIssueFilters, value: string) => void;
+  filter?: (filters: IIssueFilters) => void;
   remove: (draggableIdx: string) => IIssue | undefined;
   add: (issue: IIssue, droppableIdx: string) => void;
 }
@@ -29,7 +29,7 @@ export function Backlog({ projectId }: BacklogProps) {
 
     if (!issue) return;
     target.current?.add(issue, droppableIdx);
-    
+
     // TODO: update on be
   }
 

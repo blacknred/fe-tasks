@@ -1,4 +1,4 @@
-import { Dispatch, memo, SetStateAction } from "react";
+import { ChangeEvent, memo, useRef } from "react";
 import { useEpics } from "../../api/getIssues";
 import { useUsers } from "../../api/getUsers";
 import { IIssueFilters, IssuePriority, IssueType } from "../../types";
@@ -6,37 +6,43 @@ import styles from './Board.module.css';
 
 export type HeaderProps = {
   projectId: string;
-  onFilterChange: (filter: keyof IIssueFilters, value: string) => void;
-  onEdit: Dispatch<SetStateAction<boolean>>;
-  onIssueCreated: () => void;
+  onFilterChange: (filters: IIssueFilters) => void;
+  onEdit: () => void;
+  isEditable: boolean;
 }
 
-export const Header = memo(({ projectId, onFilterChange, onEdit }: HeaderProps) => {
+export const Header = memo(({ projectId, isEditable, onFilterChange, onEdit }: HeaderProps) => {
   const [epics] = useEpics(projectId);
   const [users] = useUsers(projectId);
+  const ref = useRef<IIssueFilters>({});
+
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    if (!ref.current) return;
+    //@ts-ignore
+    ref.current[e.target.name] = e.target.value;
+    onFilterChange(ref.current);
+  }
 
   return (
     <header className={styles.header}>
-      <h2>Backlog</h2>
-      <input onChange={(e) => onFilterChange('search', e.target.value)} placeholder="Search"></input>
-      <select onChange={(e) => onFilterChange('epicId', e.target.value)} placeholder="Select epic">
+      <input name="search" onChange={handleChange} placeholder="Search"></input>
+      <select name="epicId" onChange={handleChange}>
+        <option value={''}>Any epic</option>
         {epics?.map(epic => <option key={epic.id}>{epic.name}</option>)}
       </select>
-      <select onChange={(e) => onFilterChange('priority', e.target.value)} placeholder="Select priority">
+      <select name="priority" onChange={handleChange} >
+        <option value={''}>Any priority</option>
         {Object.values(IssuePriority).map(priority => <option key={priority}>{priority}</option>)}
       </select>
-      <select onChange={(e) => onFilterChange('type', e.target.value)} placeholder="Select type">
+      <select name="type" onChange={handleChange}>
+        <option value={''}>Any type</option>
         {Object.values(IssueType).map(type => <option key={type}>{type}</option>)}
       </select>
-      <select onChange={(e) => onFilterChange('assigneeId', e.target.value)} placeholder="Select assignee">
+      <select name="assigneeId" onChange={handleChange}>
+        <option value={''}>Any assignee</option>
         {users?.map(user => <option key={user.id} value={user.id}>{user.fullname}</option>)}
       </select>
-      <button onClick={() => onEdit(prev => !prev)}>
-        <span>&#9881;</span>
-      </button>
-      <button onClick={() => console.log('create an issue')}>
-        Create an issue
-      </button>
+      <button onClick={onEdit}>{isEditable ? 'Save' : 'Edit'} board</button>
     </header>
   )
 })

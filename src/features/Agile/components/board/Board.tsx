@@ -3,10 +3,11 @@ import { flushSync } from "react-dom";
 import { useBoard } from "../../api/getBoard";
 import { useBoardIssues } from "../../api/getIssues";
 import { useStatusses } from "../../api/getStatusses";
-import { ID, IIssueFilters } from "../../types";
+import { IBoardColumn, ID, IIssue, IIssueFilters, IIssueStatus } from "../../types";
+import { filterIssues } from "../../utils";
+import { DropArea } from "../DropArea";
 import styles from "./Board.module.css";
 import { Column } from "./Column";
-import { DropArea } from "../DropArea";
 import { Header } from "./Header";
 
 export type BoardProps = {
@@ -14,12 +15,24 @@ export type BoardProps = {
 };
 
 export function Board({ projectId }: BoardProps) {
-  // const [statusses] = useStatusses(projectId);
   const [board] = useBoard(projectId);
-  const [columns, setColumns] = useState(board?.columns);
-  const [isEditable, setIsEditable] = useState(false);
-
   const [boardIssues] = useBoardIssues(projectId);
+  const [statusses] = useStatusses(projectId);
+
+  if (!board || !boardIssues || !statusses) return null;
+
+  return <BoardContent projectId={projectId} boardColumns={board?.columns} boardIssues={boardIssues} statusses={statusses} />
+}
+
+type BoardContentProps = BoardProps & {
+  boardColumns?: IBoardColumn[];
+  boardIssues?: Record<string, IIssue[]>;
+  statusses?: IIssueStatus[];
+}
+
+function BoardContent({ projectId, boardColumns, boardIssues, statusses }: BoardContentProps) {
+  const [isEditable, setIsEditable] = useState(false);
+  const [columns, setColumns] = useState(boardColumns);
   const [issues, setIssues] = useState(boardIssues);
 
   const handleColumnReposition = useCallback((prevIdx: string, nextIdx: string) => {
@@ -27,17 +40,25 @@ export function Board({ projectId }: BoardProps) {
       if (!prev) return prev;
       const [column] = prev.splice(+prevIdx, 1);
       prev.splice(+nextIdx, 0, column);
-
-      // TODO: update on be
       return [...prev];
     });
   }, []);
 
-  const handleCardReposition = (nextColumn: string) => (id: string, nextIdx: string) => {
+  const handleEditingChange = useCallback(() => {
+    setIsEditable(prev => {
+      if (!prev) {
+        // TODO: update board on be
+      }
+      return !prev;
+    })
+  }, [])
+
+  const handleCardReposition = useCallback((nextColumn: string) => (id: string, nextIdx: string) => {
     // @ts-ignore smooth dom updates
     document.startViewTransition(() => {
       // sync update
       flushSync(() =>
+        // @ts-ignore
         setIssues((prev) => {
           if (!prev) return prev;
 
@@ -58,7 +79,7 @@ export function Board({ projectId }: BoardProps) {
         })
       );
     });
-  };
+  }, []);
 
   const handleColumnRemove = useCallback((name: string) => {
     setColumns(prev => prev?.filter((c) => c.name !== name))
@@ -66,29 +87,23 @@ export function Board({ projectId }: BoardProps) {
     // TODO: update on be
   }, [])
 
-  const handleFilterChange = useCallback((filter: keyof IIssueFilters, value: string) => {
+  const handleFilterChange = useCallback((filters: IIssueFilters) => {
     setIssues((prev) => {
+      if (!prev || !boardIssues) return prev;
       for (let column in prev) {
-        switch (filter) {
-          case 'type': prev[column] = prev[column].filter(t => t.type === value);
-          case 'search': prev[column] = prev[column].filter(t => t.title.includes(value));
-          case 'epicId': prev[column] = prev[column].filter(t => 'epicId' in t && t.epicId === value);
-          case 'assigneeId': prev[column] = prev[column].filter(t => t.assignee?.id === value);
-          case 'priority': prev[column] = prev[column].filter(t => t.priority === value);
-          default: ;
-        }
+        prev[column] = filterIssues(boardIssues[column], filters);
       }
       return { ...prev };
     })
-  }, [])
+  }, [boardIssues])
 
   return (
     <>
       <Header
         projectId={projectId}
         onFilterChange={handleFilterChange}
-        onIssueCreated={console.log}
-        onEdit={setIsEditable}
+        isEditable={isEditable}
+        onEdit={handleEditingChange}
       />
       <br />
 
@@ -104,23 +119,28 @@ export function Board({ projectId }: BoardProps) {
               editable={isEditable}
               onCardReposition={handleCardReposition(column.status)}
               onRemove={handleColumnRemove}
+              onAddIssue={console.log}
             />
 
             <DropArea id={idx + 1} onDrop={handleColumnReposition} disabled={!isEditable} />
           </Fragment>
         ))}
 
-        {/* <div>
+        <div>
           <ul>
             {isEditable
-              ? statusses?.filter((s) => !columns.includes(s)).map((s) => (
-                <li key={s} onClick={() => setColumns([...columns, s])}>
-                  {s.toUpperCase()}
+              ? statusses?.filter((s) => columns?.every(c => c.status !== s.name)).map(({ name }) => (
+                <li key={name} onClick={() => setColumns(prev => {
+                  if (!prev) return prev;
+                  const column = { name, status: name, issueOrder: {} };
+                  return [...prev, column];
+                })}>
+                  {name.toUpperCase()}
                 </li>
               ))
               : null}
           </ul>
-        </div> */}
+        </div>
       </main>
     </>
   );

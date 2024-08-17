@@ -5,6 +5,8 @@ export function useDrag(onDrag?: () => void, activeClass = "") {
   const memoizedCallback = useRef(onDrag);
 
   useEffect(() => {
+    if (!activeClass) return;
+    
     function handleDragStart(ev: DragEvent) {
       ev.stopPropagation();
       ev.dataTransfer!.setData("text", (ev.target as HTMLElement).id);
@@ -23,10 +25,11 @@ export function useDrag(onDrag?: () => void, activeClass = "") {
     draggable.current?.addEventListener("dragend", handleDragEnd);
 
     return () => {
+      draggable.current?.setAttribute("draggable", "false");
       draggable.current?.removeEventListener("dragstart", handleDragStart);
       draggable.current?.removeEventListener("dragend", handleDragEnd);
     };
-  }, []);
+  }, [activeClass]);
 
   return draggable;
 }

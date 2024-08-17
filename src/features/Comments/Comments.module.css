@@ -1,10 +1,14 @@
 .header {
   display: flex;
   gap: 1rem;
+
+  & > button.active {
+    background-color: yellowgreen;
+  }
 }
 
 .main {
-  width: 40%;
+  width: 50%;
 
   & ul {
     list-style-type: none;

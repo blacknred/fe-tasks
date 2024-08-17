@@ -1,4 +1,4 @@
-import Observable, { useObservable } from "../../lib/observable";
+import Observable, { useObservable } from "../../../../lib/observable";
 
 const initialState: { id: string; name: string } = { id: "1", name: "sdfasdf" };
 

@@ -8,5 +8,4 @@ export const users = generateUsers(10);
 export const useUsers = (projectId: ID) =>
   useQuery<IUserPreview[]>(HOST + `projects/${projectId}/users`, {
     fallback: users,
-    log: true,
   });

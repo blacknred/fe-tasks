@@ -142,11 +142,11 @@ export function Charts() {
     <>
       <h1>Charts</h1>
       <header className={styles.header}>
-        <button onClick={() => setChartKind(1)}>LineChart</button>
-        <button onClick={() => setChartKind(2)}>AreaChart</button>
-        <button onClick={() => setChartKind(3)}>BarChart</button>
-        <button onClick={() => setChartKind(4)}>PieChart</button>
-        <button onClick={() => setChartKind(5)}>RadialBarChart</button>
+        <button className={chartKind === 1 ? styles.active : undefined} onClick={() => setChartKind(1)}>LineChart</button>
+        <button className={chartKind === 2 ? styles.active : undefined} onClick={() => setChartKind(2)}>AreaChart</button>
+        <button className={chartKind === 3 ? styles.active : undefined} onClick={() => setChartKind(3)}>BarChart</button>
+        <button className={chartKind === 4 ? styles.active : undefined} onClick={() => setChartKind(4)}>PieChart</button>
+        <button className={chartKind === 5 ? styles.active : undefined} onClick={() => setChartKind(5)}>RadialBarChart</button>
         {isConnected && (
           <button onClick={() => disconnect()}>disconnect</button>
         )}

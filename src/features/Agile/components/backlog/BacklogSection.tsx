@@ -1,5 +1,6 @@
-import { forwardRef, Fragment, useImperativeHandle, useState } from "react";
+import { forwardRef, Fragment, useEffect, useImperativeHandle, useState } from "react";
 import { useBacklogStories } from "../../api/getIssues";
+import { filterIssues } from "../../utils";
 import { DropArea } from "../DropArea";
 import { SectionRef } from "./Backlog";
 import { Item } from "./Item";
@@ -13,14 +14,15 @@ export const BacklogSection = forwardRef<SectionRef, BacklogSectionProps>(({ pro
   const [backlogStories] = useBacklogStories(projectId);
   const [issues, setIssues] = useState(backlogStories);
 
+  useEffect(() => {
+    if (backlogStories) setIssues([...backlogStories]);
+  }, [backlogStories]);
+
   useImperativeHandle(ref, () => ({
-    filter(filter, value) {
+    filter(filters) {
       setIssues((prev) => {
-        switch (filter) {
-          case 'search': return prev?.filter(t => t.title.includes(value));
-          case 'epicId': return prev?.filter(t => 'epicId' in t && t.epicId === value);
-          default: return prev;
-        }
+        if (!prev || !backlogStories) return prev;
+        return filterIssues(backlogStories, filters);
       })
     },
     remove(id) {

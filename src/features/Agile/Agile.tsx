@@ -13,15 +13,16 @@ export function Agile() {
     <>
       <h1>Agile</h1>
       <header className={styles.header}>
-        <button onClick={() => setViewKind(1)}>Gantt</button>
-        <button onClick={() => setViewKind(2)}>Backlog</button>
-        <button onClick={() => setViewKind(3)}>Board</button>
+        <button className={viewKind === 1 ? styles.active : undefined} onClick={() => setViewKind(1)}>Gantt</button>
+        <button className={viewKind === 2 ? styles.active : undefined} onClick={() => setViewKind(2)}>Backlog</button>
+        <button className={viewKind === 3 ? styles.active : undefined} onClick={() => setViewKind(3)}>Board</button>
       </header>
       <br />
+      <br />
       <main className={styles.main}>
-        {viewKind === 2 && <Backlog projectId={projectId} />}
         {viewKind === 1 && <Gantt projectId={projectId} />}
-        {viewKind === 1 && <Board projectId={projectId} />}
+        {viewKind === 2 && <Backlog projectId={projectId} />}
+        {viewKind === 3 && <Board projectId={projectId} />}
       </main>
     </>
   );

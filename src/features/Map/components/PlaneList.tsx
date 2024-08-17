@@ -1,7 +1,7 @@
 import { Dispatch, forwardRef, SetStateAction } from "react";
 import { usePlanes } from "../api/getPlanes";
 import { IPlane } from "../types";
-import styles from "./Map.module.css";
+import styles from "../Map.module.css";
 
 export type PlaneListProps = {
   selectedCode?: IPlane["code"];

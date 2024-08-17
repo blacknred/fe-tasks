@@ -34,9 +34,9 @@ export function Comments() {
     <>
       <h1>Comments</h1>
       <header className={styles.header}>
-        <button onClick={() => setViewMode(1)}>Collapsed</button>
-        <button onClick={() => setViewMode(2)}>Pagination</button>
-        <button onClick={() => setViewMode(3)}>Virtualization</button>
+        <button className={viewMode === 1 ? styles.active : undefined} onClick={() => setViewMode(1)}>Collapsed</button>
+        <button className={viewMode === 2 ? styles.active : undefined} onClick={() => setViewMode(2)}>Pagination</button>
+        <button className={viewMode === 3 ? styles.active : undefined} onClick={() => setViewMode(3)}>Virtualization</button>
         <button onClick={() => refetch(true)}>refetch</button>
       </header>
       <br />

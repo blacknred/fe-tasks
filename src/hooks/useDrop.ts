@@ -8,6 +8,8 @@ export function useDrop(
   const memoizedCallback = useRef(onDrop);
 
   useEffect(() => {
+    if (!activeClass) return;
+
     function handleDragEnter(ev: DragEvent) {
       ev.preventDefault();
       (ev.target as HTMLElement).classList.add(activeClass);
@@ -42,7 +44,7 @@ export function useDrop(
       droppable.current?.removeEventListener("dragover", handleDragOver);
       droppable.current?.removeEventListener("drop", handleDrop);
     };
-  }, []);
+  }, [activeClass]);
 
   return droppable;
 }

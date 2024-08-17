@@ -17,7 +17,7 @@ export type RouteProps = {
 export function Route({ path, element }: RouteProps) {
   const ctx = useContext(RouterContext);
 
-  if (ctx?.path !== path) return null;
+  if (ctx?.path.split('?')[0] !== path) return null;
   if (ctx) ctx.needFallback.current = false;
 
   return element;

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import useQuery from "../../../hooks/useQuery";
 import { ID, IIssue, IIssueFilters, IssueType } from "../types";
 import {
@@ -15,7 +16,6 @@ export const issues = generateIssues(200);
 const useIssues = (projectId: ID, params: IIssueFilters = {}) =>
   useQuery<IIssue[]>(HOST + `projects/${projectId}/issues`, {
     fallback: filterIssues(issues, params),
-    log: true,
   });
 
 export const useEpics = (projectId: ID, params?: IIssueFilters) =>
@@ -37,7 +37,16 @@ export const useSprintIssues = (
 ) => useIssues(projectId, { ...params, sprintId });
 
 export const useBoardIssues = (projectId: ID, params?: IIssueFilters) => {
-  const res = useSprintIssues(projectId, findCurrentSprint(sprints), params);
-  const data = res[0] ? prepareIssuesForBoard(res[0], board.columns) : res[0];
-  return [data, ...res.slice(0, 1)] as const;
+  const [data, ...rest] = useSprintIssues(
+    projectId,
+    findCurrentSprint(sprints),
+    params
+  );
+
+  const issues = useMemo(
+    () => (!data ? data : prepareIssuesForBoard(data, board.columns)),
+    [data]
+  );
+
+  return [issues, ...rest] as const;
 };

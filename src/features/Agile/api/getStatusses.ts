@@ -8,5 +8,4 @@ export const statusses = generateStatusses();
 export const useStatusses = (projectId: ID) =>
   useQuery<IIssueStatus[]>(HOST + `projects/${projectId}/statusses`, {
     fallback: statusses,
-    log: true,
   });
