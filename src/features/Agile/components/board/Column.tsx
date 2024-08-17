@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { useDrag } from '../../../../hooks/useDrag';
 import { IIssue } from '../../types';
 import { DropArea } from '../DropArea';
@@ -6,30 +6,31 @@ import styles from './Board.module.css';
 import { Card } from './Card';
 
 export type ColumnProps = {
-  title: string;
-  cards?: IIssue[];
-  onRemove: () => void;
-  onCardReposition: (taskId: string, newIndex: string) => void;
+  name: string;
+  idx: number;
   editable: boolean;
+  cards?: IIssue[];
+  onRemove: (name: string) => void;
+  onCardReposition: (taskId: string, newIndex: string) => void;
 };
 
-export function Column({ onRemove, cards, title, onCardReposition, editable }: ColumnProps) {
-  const draggable = useDrag(undefined, editable ? styles.drag : "");
+export const Column = memo(({ cards, name, idx, editable, onRemove, onCardReposition }: ColumnProps) => {
+  const draggable = useDrag(undefined, styles.drag);
 
   return (
     // @ts-ignore
-    <div ref={draggable} id={title} className={styles.column}>
+    <div ref={editable ? draggable : null} id={idx} className={styles.column}>
       <div>
         <p>
-          {title.toUpperCase()}: {cards?.length}
+          {name.toUpperCase()}: {cards?.length}
         </p>
-        {editable && <span onClick={onRemove}>x</span>}
+        {editable && <span onClick={() => onRemove(name)}>x</span>}
       </div>
       <ul>
         <DropArea id={0} onDrop={onCardReposition} disabled={editable} />
         {cards?.map((card, idx) => (
           <Fragment key={card.id}>
-            <Card {...card} />
+            <Card {...card} disabled={editable} />
             <DropArea
               id={idx + 1}
               onDrop={onCardReposition}
@@ -40,4 +41,4 @@ export function Column({ onRemove, cards, title, onCardReposition, editable }: C
       </ul>
     </div>
   );
-}
+})

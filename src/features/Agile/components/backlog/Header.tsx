@@ -11,7 +11,6 @@ export type HeaderProps = {
 
 export const Header = memo(({ projectId, onFilterChange }: HeaderProps) => {
   const [epics] = useEpics(projectId);
-  console.table(epics)
 
   return (
     <header className={styles.header}>

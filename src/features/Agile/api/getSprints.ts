@@ -8,4 +8,5 @@ export const sprints = generateSprints(2);
 export const useSprints = (projectId: ID) =>
   useQuery<ISprint[]>(HOST + `projects/${projectId}/sprints`, {
     fallback: sprints,
+    log: true,
   });

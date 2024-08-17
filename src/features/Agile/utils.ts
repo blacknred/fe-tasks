@@ -3,6 +3,7 @@ import {
   IBoardColumn,
   IIssue,
   IIssueFilters,
+  IIssueStatus,
   ISprint,
   IssuePriority,
   IssueType,
@@ -21,6 +22,13 @@ export const STATUSSES = [
 export const DAY = 1000 * 60 * 60 * 24;
 
 const EPIC_DURATION = 30;
+
+export function generateStatusses(): IIssueStatus[] {
+  return STATUSSES.map((name) => ({
+    name,
+    transitions: STATUSSES,
+  }));
+}
 
 export function generateBoard(): IBoard {
   const statussesCount = Math.floor(Math.random() * STATUSSES.length);
@@ -77,13 +85,10 @@ export const generateIssues = (length: number): IIssue[] => {
       tags: [],
       assignee: users[Math.floor(random * users.length)],
       version: 1,
-      status: {
-        name:
-          type === IssueType.EPIC
-            ? STATUSSES[0]
-            : STATUSSES[Math.floor(random * STATUSSES.length)],
-        transitions: STATUSSES,
-      },
+      status:
+        type === IssueType.EPIC
+          ? STATUSSES[0]
+          : STATUSSES[Math.floor(random * STATUSSES.length)],
     };
 
     if (issue.type === IssueType.EPIC) {
@@ -96,7 +101,7 @@ export const generateIssues = (length: number): IIssue[] => {
       return issue;
     }
 
-    //         boardOrder: Math.random() > 0.5 ? Math.floor(rand * 10) : null,
+    // boardOrder: Math.random() > 0.5 ? Math.floor(rand * 10) : null,
 
     issue.priority = priorities[Math.floor(random * priorities.length)];
 
@@ -139,7 +144,7 @@ export function prepareIssuesForBoard(
 ) {
   const grouped: Record<string, IIssue[]> = {};
   for (let status of STATUSSES) {
-    grouped[status] = issues.filter((i) => (i.status.name = status));
+    grouped[status] = issues.filter((i) => (i.status = status));
   }
   for (let column of columns) {
     const { status, issueOrder } = column;

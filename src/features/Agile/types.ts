@@ -67,7 +67,7 @@ export interface IIssue {
   version?: number;
   tags?: string[];
 
-  status: IIssueStatus;
+  status: string;
   priority?: IssuePriority;
   sprintId?: ID;
   points?: number;

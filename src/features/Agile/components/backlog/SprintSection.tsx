@@ -13,9 +13,8 @@ export type SprintSectionProps = {
 }
 
 export function SprintSection({ projectId, onDrop, childRef }: SprintSectionProps) {
-  const [currentSprintIndex, setCurrentSprintIndex] = useState(0);
   const [sprints] = useSprints(projectId);
-  console.table(sprints);
+  const [currentSprintIndex, setCurrentSprintIndex] = useState(0);
 
   if (!sprints) return null;
   if (!sprints[currentSprintIndex]) return 'No sprints found';
@@ -38,27 +37,22 @@ type SprintIssuesProps = ISprint & SprintSectionProps;
 
 const SprintIssues = forwardRef<SectionRef, SprintIssuesProps>(({ projectId, id, onDrop }, ref) => {
   const [sprintIssues] = useSprintIssues(projectId, id);
-  console.table(sprintIssues);
-
   const [issues, setIssues] = useState(sprintIssues);
 
   useImperativeHandle(ref, () => ({
-    remove(draggableId) {
-      if (issues === undefined) return;
-      const idx = issues.findIndex(issue => issue.id == draggableId);
+    remove(id) {
+      if (!issues) return;
+      const idx = issues.findIndex(issue => issue.id == id);
       if (idx === -1) return;
-      const issue = issues[idx];
-      const head = issues.slice(0, idx);
-      const tail = issues.slice(idx + 1, issues.length);
-      setIssues([...head, ...tail]);
+      const [issue] = issues.splice(idx, 1);
+      setIssues([...issues]);
       return issue;
     },
-    add(issue, droppableIdx) {
+    add(issue, idx) {
       setIssues(prev => {
         if (!prev) return prev;
-        const head = prev.slice(0, +droppableIdx);
-        const tail = prev.slice(+droppableIdx, prev.length);
-        return [...head, issue, ...tail];
+        prev.splice(+idx, 0, issue);
+        return [...prev];
       })
     }
   }), [])

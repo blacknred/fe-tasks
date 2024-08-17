@@ -1,10 +1,11 @@
+import { memo } from "react";
 import { useDrag } from "../../../../hooks/useDrag";
 import { IIssue } from "../../types";
 import styles from './Board.module.css';
 
 export type ItemProps = IIssue;
 
-export function Item({ id, title }: ItemProps) {
+export const Item = memo(({ id, title }: ItemProps) => {
   const draggable = useDrag(undefined, styles.drag);
 
   return (
@@ -13,4 +14,4 @@ export function Item({ id, title }: ItemProps) {
       <p>{title}</p>
     </li>
   );
-}
+})

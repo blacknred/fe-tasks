@@ -29,6 +29,7 @@ export function Backlog({ projectId }: BacklogProps) {
 
     if (!issue) return;
     target.current?.add(issue, droppableIdx);
+    
     // TODO: update on be
   }
 

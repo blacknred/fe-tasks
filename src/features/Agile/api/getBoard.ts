@@ -8,4 +8,5 @@ export const board = generateBoard();
 export const useBoard = (projectId: ID) =>
   useQuery<IBoard>(HOST + `projects/${projectId}/board`, {
     fallback: board,
+    log: true,
   });

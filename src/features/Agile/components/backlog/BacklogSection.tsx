@@ -11,8 +11,6 @@ export type BacklogSectionProps = {
 
 export const BacklogSection = forwardRef<SectionRef, BacklogSectionProps>(({ projectId, onDrop }, ref) => {
   const [backlogStories] = useBacklogStories(projectId);
-  console.table(backlogStories);
-
   const [issues, setIssues] = useState(backlogStories);
 
   useImperativeHandle(ref, () => ({
@@ -25,22 +23,19 @@ export const BacklogSection = forwardRef<SectionRef, BacklogSectionProps>(({ pro
         }
       })
     },
-    remove(draggableId) {
-      if (issues === undefined) return;
-      const idx = issues.findIndex(issue => issue.id == draggableId);
+    remove(id) {
+      if (!issues) return;
+      const idx = issues.findIndex(issue => issue.id == id);
       if (idx === -1) return;
-      const issue = issues[idx];
-      const head = issues.slice(0, idx);
-      const tail = issues.slice(idx + 1, issues.length);
-      setIssues([...head, ...tail]);
+      const [issue] = issues.splice(idx, 1);
+      setIssues([...issues]);
       return issue;
     },
-    add(issue, droppableIdx) {
+    add(issue, idx) {
       setIssues(prev => {
         if (!prev) return prev;
-        const head = prev.slice(0, +droppableIdx);
-        const tail = prev.slice(+droppableIdx, prev.length);
-        return [...head, issue, ...tail];
+        prev.splice(+idx, 0, issue);
+        return [...prev];
       })
     }
   }), [])

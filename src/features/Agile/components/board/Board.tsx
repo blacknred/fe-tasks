@@ -13,52 +13,61 @@ export type BoardProps = {
   projectId: ID;
 };
 
-export default function Board({ projectId }: BoardProps) {
+export function Board({ projectId }: BoardProps) {
   // const [statusses] = useStatusses(projectId);
   const [board] = useBoard(projectId);
-  const [boardIssues] = useBoardIssues(projectId);
-  console.table(boardIssues);
-
-  const [isEditable, setIsEditable] = useState(false);
   const [columns, setColumns] = useState(board?.columns);
-  const [issues, setTasks] = useState(boardIssues);
+  const [isEditable, setIsEditable] = useState(false);
 
-  const handleColumnReposition = (column, newIndex) => {
+  const [boardIssues] = useBoardIssues(projectId);
+  const [issues, setIssues] = useState(boardIssues);
+
+  const handleColumnReposition = useCallback((prevIdx: string, nextIdx: string) => {
     setColumns((prev) => {
-      prev.splice(prev.indexOf(column), 1);
-      const head = prev.slice(0, newIndex);
-      const tail = prev.slice(newIndex, prev.length);
-      console.log(head, tail, [...head, column, ...tail]);
-      return [...head, column, ...tail];
-    });
-  };
+      if (!prev) return prev;
+      const [column] = prev.splice(+prevIdx, 1);
+      prev.splice(+nextIdx, 0, column);
 
-  const handleCardReposition = (newStatus) => (taskId, newIndex) => {
-    console.log("card reposition", newStatus, taskId, newIndex);
-    // smooth dom updates
+      // TODO: update on be
+      return [...prev];
+    });
+  }, []);
+
+  const handleCardReposition = (nextColumn: string) => (id: string, nextIdx: string) => {
+    // @ts-ignore smooth dom updates
     document.startViewTransition(() => {
       // sync update
       flushSync(() =>
-        setTasks((prev) => {
-          const idx = prev.findIndex((t) => t.id == taskId);
-          prev[idx].status = newStatus;
-          prev[idx].boardOrder = newIndex;
-          console.log(idx, prev);
-          return [...prev];
+        setIssues((prev) => {
+          if (!prev) return prev;
+
+          for (let column in prev) {
+            const idx = prev[column].findIndex((t) => t.id == id);
+            if (idx === -1) continue;
+
+            const [issue] = prev[column].splice(idx, 1);
+            prev[column] = [...prev[column]];
+            issue.status = nextColumn;
+
+            prev[nextColumn].splice(+nextIdx, 0, issue);
+            prev[nextColumn] = [...prev[nextColumn]];
+
+            // TODO: update on be
+            return { ...prev }
+          }
         })
       );
     });
   };
 
-  const handleCardRemove = useCallback((name: string) => () => {
-    setBoard(prev => {
-      if (!prev) return prev;
-      return { ...prev, columns: prev.columns.filter((c) => c.name !== name) }
-    })
+  const handleColumnRemove = useCallback((name: string) => {
+    setColumns(prev => prev?.filter((c) => c.name !== name))
+
+    // TODO: update on be
   }, [])
 
-  const handleFilterChange = useCallback((filter: keyof IIssueFilters) => (value: string) => {
-    setTasks((prev) => {
+  const handleFilterChange = useCallback((filter: keyof IIssueFilters, value: string) => {
+    setIssues((prev) => {
       for (let column in prev) {
         switch (filter) {
           case 'type': prev[column] = prev[column].filter(t => t.type === value);
@@ -77,30 +86,27 @@ export default function Board({ projectId }: BoardProps) {
     <>
       <Header
         projectId={projectId}
-        onSearch={handleFilterChange('search')}
-        onEpicChange={handleFilterChange('epicId')}
-        onTypeChange={handleFilterChange('type')}
-        onPriorityChange={handleFilterChange('priority')}
-        onAssigneeChange={handleFilterChange('assigneeId')}
-        onEdit={setIsEditable}
+        onFilterChange={handleFilterChange}
         onIssueCreated={console.log}
+        onEdit={setIsEditable}
       />
       <br />
 
       <main className={styles.grid}>
-        <DropArea id={0} onDrop={handleColumnReposition} />
+        <DropArea id={0} onDrop={handleColumnReposition} disabled={!isEditable} />
 
-        {board?.columns.map((column, idx) => (
+        {columns?.map((column, idx) => (
           <Fragment key={column.name}>
             <Column
-              title={column.name}
+              idx={idx}
+              name={column.name}
               cards={issues?.[column.status]}
               editable={isEditable}
               onCardReposition={handleCardReposition(column.status)}
-              onRemove={handleCardRemove(column.name)}
+              onRemove={handleColumnRemove}
             />
 
-            <DropArea id={idx + 1} onDrop={handleColumnReposition} />
+            <DropArea id={idx + 1} onDrop={handleColumnReposition} disabled={!isEditable} />
           </Fragment>
         ))}
 

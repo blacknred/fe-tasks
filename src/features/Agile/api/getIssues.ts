@@ -15,6 +15,7 @@ export const issues = generateIssues(200);
 const useIssues = (projectId: ID, params: IIssueFilters = {}) =>
   useQuery<IIssue[]>(HOST + `projects/${projectId}/issues`, {
     fallback: filterIssues(issues, params),
+    log: true,
   });
 
 export const useEpics = (projectId: ID, params?: IIssueFilters) =>
