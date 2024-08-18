@@ -1,16 +1,17 @@
 import { useRef } from "react";
-import { IIssue, IIssueFilters } from "../../types";
+import { flushSync } from "react-dom";
+import { IIssue, IIssueFilters, ISprint } from "../../types";
+import styles from './Backlog.module.css';
 import { BacklogSection } from "./BacklogSection";
 import { Header } from "./Header";
-import { SprintSection } from "./SprintSection";
-import styles from './Backlog.module.css';
+import { SprintSection, SprintSectionRef } from "./SprintSection";
 
 export type BacklogProps = {
   projectId: string;
 };
 
 export type SectionRef = {
-  filter?: (filters: IIssueFilters) => void;
+  filter: (filters: IIssueFilters) => void;
   remove: (draggableIdx: string) => IIssue | undefined;
   add: (issue: IIssue, droppableIdx: string) => void;
 }
@@ -18,18 +19,28 @@ export type SectionRef = {
 export function Backlog({ projectId }: BacklogProps) {
   const sprintRef = useRef<SectionRef>(null);
   const backlogRef = useRef<SectionRef>(null);
+  const sprintSectionRef = useRef<SprintSectionRef>(null);
 
-  const onDrop = (section: 'sprint' | 'backlog') => (draggableId: string, droppableIdx: string) => {
-    let target = section === 'sprint' ? backlogRef : sprintRef;
-    let issue = target.current?.remove(draggableId);
 
-    if (!issue) {
-      target = section === 'sprint' ? sprintRef : backlogRef;
-      issue = target.current?.remove(draggableId);
-    }
-
-    if (!issue) return;
-    target.current?.add(issue, droppableIdx);
+  const handleItemShift = (sprintId?: string) => (draggableId: string, droppableIdx: string) => {
+    // @ts-ignore smooth dom updates
+    document.startViewTransition(() => {
+      flushSync(() => {
+        if (sprintId) {
+          let issue = backlogRef.current?.remove(draggableId);
+          if (!issue) issue = sprintRef.current?.remove(draggableId);
+          if (!issue) return;
+          issue.sprintId = sprintId;
+          sprintRef.current?.add(issue, droppableIdx);
+        } else {
+          let issue = sprintRef.current?.remove(draggableId);
+          if (!issue) issue = backlogRef.current?.remove(draggableId);
+          if (!issue) return;
+          issue.sprintId = undefined;
+          backlogRef.current?.add(issue, droppableIdx);
+        }
+      })
+    });
 
     // TODO: update on be
   }
@@ -38,20 +49,24 @@ export function Backlog({ projectId }: BacklogProps) {
     <>
       <Header
         projectId={projectId}
-        onFilterChange={backlogRef.current?.filter}
-        onSprintCreated={console.log}
+        onSprintSelect={(sprint: ISprint) => sprintSectionRef.current?.update(sprint)}
+        onFilterChange={(filters: IIssueFilters) => {
+          backlogRef.current?.filter?.(filters);
+          sprintRef.current?.filter?.(filters);
+        }}
       />
       <br />
       <main className={styles.grid}>
         <SprintSection
-          childRef={sprintRef}
+          innerRef={sprintRef}
           projectId={projectId}
-          onDrop={onDrop('backlog')}
+          onDropItem={handleItemShift}
+          ref={sprintSectionRef}
         />
         <BacklogSection
-          ref={backlogRef}
+          innerRef={backlogRef}
           projectId={projectId}
-          onDrop={onDrop('backlog')}
+          onDropItem={handleItemShift}
         />
       </main>
     </>

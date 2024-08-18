@@ -7,26 +7,26 @@
 
 .grid {
   display: flex;
+}
 
-  & > div:last-of-type {
-    flex: 1;
+.statusList {
+  flex: 1;
+  display: flex;
+  justify-content: end;
+
+  & > ul {
+    list-style: none;
     display: flex;
-    justify-content: end;
+    gap: 10px;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 0px;
+    margin: 0px;
 
-    & > ul {
-      list-style: none;
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-      cursor: pointer;
-      padding: 0px;
-      margin: 0px;
-
-      & > li {
-        border: 1px solid #aaa;
-        writing-mode: vertical-lr;
-        padding: 10px;
-      }
+    & > li {
+      border: 1px solid #aaa;
+      writing-mode: vertical-lr;
+      padding: 10px;
     }
   }
 }

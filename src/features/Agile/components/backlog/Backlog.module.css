@@ -7,27 +7,49 @@
 
 .grid {
   display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
 
+.item {
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  background-color: #999;
+  padding: 0 0.8rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 
-  & > section {
-    flex: 1;
-    display: flex;
-    justify-content: end;
+  & > span {
+    min-width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 5px;
 
-    /* & > ul {
-      list-style: none;
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-      cursor: pointer;
-      padding: 0px;
-      margin: 0px;
+    &[data-type="TASK"] {
+      background-color: green;
+    }
+    &[data-type="STORY"] {
+      background-color: orange;
+    }
+  }
 
-      & > li {
-        border: 1px solid #aaa;
-        writing-mode: vertical-lr;
-        padding: 10px;
-      }
-    } */
+  & > p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    & > b {
+      font-size: small;
+      margin-top: 3px;
+    }
+  }
+}
+
+.drag {
+  &:active {
+    opacity: 0.1;
+    cursor: grab;
   }
 }

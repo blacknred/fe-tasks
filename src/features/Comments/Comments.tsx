@@ -7,7 +7,7 @@ import { transformComments } from "./utils";
 
 export function Comments() {
   const [viewMode, setViewMode] = useState<1 | 2 | 3>(1);
-  const [data, _, isFetching, refetch] = useComments();
+  const { data, isFetching, refetch } = useComments();
 
   function renderContent() {
     if (isFetching) return "Loading...";

@@ -23,7 +23,7 @@ export function Board() {
           </Fragment>
         ))}
 
-        <div>
+        <div className={styles.statusList}>
           <ul>
             {isEditable
               ? statusses?.filter((s) => board?.columns.every(c => c.status !== s.name)).map(({ name }) => (

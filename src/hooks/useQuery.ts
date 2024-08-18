@@ -6,9 +6,12 @@ export type Options<DataType, ErrorType> = RequestInit & {
   interceptor?: (data: any) => DataType;
   onError?: (err: ErrorType) => void;
   contentType?: "json" | "text" | "blob";
-  refetchInterval?: number;
-  attempts?: number;
   fallback?: DataType;
+  attempts?: number;
+  skipInitial?: boolean;
+  refetchInterval?: number;
+  watchOnline?: boolean;
+  watchVisibility?: boolean;
 };
 
 export default function useQuery<DataType = unknown, ErrorType = unknown>(
@@ -17,12 +20,19 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
 ) {
   const [data, setData] = useState<DataType>();
   const [error, setError] = useState<ErrorType>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
   const memoizedOptions = useRef<typeof options>(options);
+  const optimisticDataStack = useRef<DataType[]>([]);
+
+  if (options?.fallback !== memoizedOptions.current?.fallback) {
+    memoizedOptions.current!.fallback = options?.fallback;
+  }
+
   const isMounted = useRef(true);
 
-  const fetcher = useCallback(
-    async function (invalidate = false) {
+  const refetch = useCallback(
+    async function (reset = false) {
       const {
         onError,
         interceptor,
@@ -37,8 +47,9 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
       isMounted.current = true;
       let attempt = 0;
 
-      if (invalidate) setIsLoading(true);
+      if (reset) setIsFetching(true);
 
+      // if (!offline) {
       while (attempt < attempts) {
         try {
           const res = await fetch(url, init);
@@ -54,6 +65,8 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
           } else {
             setData(data as DataType);
           }
+
+          optimisticDataStack.current.pop();
           break;
         } catch (err) {
           if (!isMounted.current) return;
@@ -63,29 +76,58 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
           attempt++;
         }
       }
+      // }
 
-      if (invalidate) setIsLoading(false);
+      if (reset) setIsFetching(false);
     },
     [url, memoizedOptions, isMounted]
   );
 
+  const mutate = useCallback(
+    (optimisticData: DataType) => {
+      setData((prev) => {
+        if (prev) optimisticDataStack.current.push(prev);
+        return optimisticData;
+      });
+
+      return (full = false) => {
+        if (full) {
+          const state = optimisticDataStack.current.shift();
+          if (!state) return;
+          setData(state);
+          optimisticDataStack.current.length = 0;
+        } else {
+          const state = optimisticDataStack.current.pop();
+          if (state) setData(state);
+        }
+      };
+    },
+    [refetch]
+  );
+
   useEffect(() => {
-    fetcher(true);
+    const { skipInitial, refetchInterval, watchOnline, watchVisibility } =
+      memoizedOptions.current || {};
+
+    if (!skipInitial) refetch(true);
 
     let interval: NodeJS.Timeout;
-    const { refetchInterval } = memoizedOptions.current || {};
 
-    const handleVisibilityRefetch = () => !document.hidden && fetcher(false);
-    window.document.addEventListener(
-      "visibilitychange",
-      handleVisibilityRefetch
-    );
+    const handleVisibilityRefetch = () => !document.hidden && refetch();
+    if (watchVisibility) {
+      window.document.addEventListener(
+        "visibilitychange",
+        handleVisibilityRefetch
+      );
+    }
 
-    const handleOnlineRefetch = () => fetcher(false);
-    window.addEventListener("online", handleOnlineRefetch);
+    const handleOnlineRefetch = () => refetch();
+    if (watchOnline) {
+      window.addEventListener("online", handleOnlineRefetch);
+    }
 
     if (refetchInterval) {
-      interval = setInterval(fetcher, refetchInterval * 1000);
+      interval = setInterval(refetch, refetchInterval * 1000);
     }
 
     return () => {
@@ -97,7 +139,7 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
         handleVisibilityRefetch
       );
     };
-  }, [fetcher]);
+  }, [refetch]);
 
-  return [data, error, isLoading, fetcher] as const;
+  return { data, error, isFetching, refetch, mutate } as const;
 }

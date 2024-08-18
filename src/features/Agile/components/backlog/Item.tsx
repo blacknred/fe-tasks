@@ -5,13 +5,17 @@ import styles from './Backlog.module.css';
 
 export type ItemProps = IIssue;
 
-export const Item = memo(({ id, title }: ItemProps) => {
+export const Item = memo(({ id, title, name, type, epicId }: ItemProps) => {
   const draggable = useDrag(undefined, styles.drag);
 
   return (
     // @ts-ignore
     <li id={id} ref={draggable} className={styles.item}>
-      <p>{title}</p>
+      <span data-type={type} />
+      <p>
+        {title} <br/>
+        <b>{name}</b> <i>{epicId?.toLowerCase()}</i>
+      </p>
     </li>
   );
 })

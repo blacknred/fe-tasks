@@ -6,14 +6,14 @@ import styles from './Board.module.css';
 
 export type HeaderProps = {
   projectId: string;
-  onFilterChange: (filters: IIssueFilters) => void;
-  onEdit: () => void;
   isEditable: boolean;
+  onEdit: () => void;
+  onFilterChange: (filters: IIssueFilters) => void;
 }
 
 export const Header = memo(({ projectId, isEditable, onFilterChange, onEdit }: HeaderProps) => {
-  const [epics] = useEpics(projectId);
-  const [users] = useUsers(projectId);
+  const { data: epics } = useEpics(projectId);
+  const { data: users } = useUsers(projectId);
   const ref = useRef<IIssueFilters>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -28,7 +28,7 @@ export const Header = memo(({ projectId, isEditable, onFilterChange, onEdit }: H
       <input name="search" onChange={handleChange} placeholder="Search"></input>
       <select name="epicId" onChange={handleChange}>
         <option value={''}>Any epic</option>
-        {epics?.map(epic => <option key={epic.id}>{epic.name}</option>)}
+        {epics?.map(epic => <option key={epic.id}>{epic.id}</option>)}
       </select>
       <select name="priority" onChange={handleChange} >
         <option value={''}>Any priority</option>

@@ -7,61 +7,28 @@
 
 .grid {
   display: flex;
-
-  & > div:last-of-type {
-    flex: 1;
-    display: flex;
-    justify-content: end;
-
-    & > ul {
-      list-style: none;
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-      cursor: pointer;
-      padding: 0px;
-      margin: 0px;
-
-      & > li {
-        border: 1px solid #aaa;
-        writing-mode: vertical-lr;
-        padding: 10px;
-      }
-    }
-  }
+  justify-content: center;
 }
 
-.column {
-  width: 100%;
-  min-width: 12rem;
-  max-width: 15rem;
-  background-color: #eee;
+.statusList {
+  /* flex: 1; */
   display: flex;
-  flex-direction: column;
-  height: max-content;
-  padding: 0 8px;
-
-  &[data-disabled="false"] {
-    border: 5px solid #ddd;
-  }
-
-  & > div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 0 5px;
-
-    & > p {
-      cursor: grab;
-    }
-  }
+  justify-content: end;
 
   & > ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    cursor: pointer;
     padding: 0px;
     margin: 0px;
-    flex: 1px;
-    list-style: none;
+
+    & > li {
+      border: 1px solid #aaa;
+      writing-mode: vertical-lr;
+      padding: 10px;
+    }
   }
 }
 

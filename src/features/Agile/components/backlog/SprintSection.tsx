@@ -1,71 +1,44 @@
-import { forwardRef, Fragment, Ref, useImperativeHandle, useState } from "react";
+import { forwardRef, Ref, useImperativeHandle, useState } from "react";
 import { useSprintIssues } from "../../api/getIssues";
-import { useSprints } from "../../api/getSprints";
-import { ISprint } from "../../types";
-import { DropArea } from "../dropArea/DropArea";
+import { Column } from "../column/Column";
 import { SectionRef } from "./Backlog";
 import { Item } from "./Item";
+import { ISprint } from "../../types";
 
 export type SprintSectionProps = {
   projectId: string;
-  childRef?: Ref<SectionRef>;
-  onDrop: (draggableId: string, droppableId: string) => void;
+  innerRef?: Ref<SectionRef>;
+  onDropItem: (sprintId?: string) => (draggableId: string, droppableId: string) => void;
 }
 
-export function SprintSection({ projectId, onDrop, childRef }: SprintSectionProps) {
-  const [sprints] = useSprints(projectId);
-  const [currentSprintIndex, setCurrentSprintIndex] = useState(0);
-
-  if (!sprints) return null;
-  if (!sprints[currentSprintIndex]) return 'No sprints found';
-
-  return (
-    <section>
-      <header>
-        <h3>{sprints[currentSprintIndex].name}</h3>
-        <select onChange={(e) => setCurrentSprintIndex(+e.target.value)} placeholder="Select sprint">
-          {sprints.map((sprint, idx) => <option key={sprint.id} value={idx}>{sprint.name}</option>)}
-        </select>
-      </header>
-
-      <SprintIssues ref={childRef} {...sprints[currentSprintIndex]} onDrop={onDrop} />
-    </section>
-  )
+export type SprintSectionRef = {
+  update: (sprint: ISprint) => void;
 }
 
-type SprintIssuesProps = ISprint & SprintSectionProps;
-
-const SprintIssues = forwardRef<SectionRef, SprintIssuesProps>(({ projectId, id, onDrop }, ref) => {
-  const [sprintIssues] = useSprintIssues(projectId, id);
-  const [issues, setIssues] = useState(sprintIssues);
+export const SprintSection = forwardRef<SprintSectionRef, SprintSectionProps>(({ projectId, onDropItem, innerRef }, ref) => {
+  const [sprint, setSprint] = useState<ISprint>()
+  const { data: issues, refetch } = useSprintIssues(projectId, { sprintId: sprint?.id });
+  console.log(sprint?.id, issues?.length)
 
   useImperativeHandle(ref, () => ({
-    remove(id) {
-      if (!issues) return;
-      const idx = issues.findIndex(issue => issue.id == id);
-      if (idx === -1) return;
-      const [issue] = issues.splice(idx, 1);
-      setIssues([...issues]);
-      return issue;
-    },
-    add(issue, idx) {
-      setIssues(prev => {
-        if (!prev) return prev;
-        prev.splice(+idx, 0, issue);
-        return [...prev];
-      })
+    update(sprint) {
+      setSprint(sprint);
+      refetch();
     }
-  }), [])
+  }), [setSprint])
+
+  if (!sprint) return null;
+  if (!issues) return 'No issues found';
 
   return (
-    <ul>
-      <DropArea id={0} onDrop={onDrop} />
-      {issues?.map((task, idx) => (
-        <Fragment key={task.id}>
-          <Item {...task} />
-          <DropArea id={idx + 1} onDrop={onDrop} />
-        </Fragment>
-      ))}
-    </ul>
+    <Column
+      // key={issues.length}
+      idx={0}
+      ref={innerRef}
+      name={sprint.name}
+      items={issues}
+      onDropItem={onDropItem(sprint.id)}
+      ItemComponent={Item}
+    />
   )
 })

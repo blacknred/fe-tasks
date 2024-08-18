@@ -1,0 +1,50 @@
+.column {
+  width: 100%;
+  min-width: 12em;
+  max-width: 20em;
+  background-color: #eee;
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  padding: 0 8px;
+
+  &[data-disabled="false"] {
+    animation: inhale 2s infinite;
+  }
+
+  & > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 5px;
+
+    & > p {
+      cursor: grab;
+    }
+  }
+
+  & > ul {
+    padding: 0px;
+    margin: 0px;
+    flex: 1px;
+    list-style: none;
+  }
+}
+
+.drag {
+  &:active {
+    opacity: 0.1;
+    cursor: grab;
+  }
+}
+
+@keyframes inhale {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

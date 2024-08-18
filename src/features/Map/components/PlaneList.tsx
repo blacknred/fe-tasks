@@ -9,7 +9,7 @@ export type PlaneListProps = {
 };
 
 export const PlaneList = forwardRef<unknown, PlaneListProps>(({ selectedCode, onCodeSelected }, ref) => {
-  const [planes, _, isFetching] = usePlanes();
+  const { data: planes, isFetching } = usePlanes();
 
   return (
 

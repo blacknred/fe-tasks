@@ -3,15 +3,18 @@ import { useEpics } from "../../api/getIssues";
 import { SectionRef } from "./Backlog";
 import styles from './Backlog.module.css';
 import { IIssueFilters } from "../../types";
+import { useSprints } from "../../api/getSprints";
+import { SprintSectionRef } from "./SprintSection";
 
 export type HeaderProps = {
   projectId: string;
-  onFilterChange?: SectionRef['filter'];
-  onSprintCreated?: () => void;
+  onFilterChange: SectionRef['filter'];
+  onSprintSelect: SprintSectionRef['update'];
 }
 
-export const Header = memo(({ projectId, onFilterChange }: HeaderProps) => {
-  const [epics] = useEpics(projectId);
+export const Header = memo(({ projectId, onFilterChange, onSprintSelect }: HeaderProps) => {
+  const { data: epics } = useEpics(projectId);
+  const { data: sprints } = useSprints(projectId);
   const ref = useRef<IIssueFilters>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -26,7 +29,14 @@ export const Header = memo(({ projectId, onFilterChange }: HeaderProps) => {
       <input name="search" onChange={handleChange} placeholder="Search"></input>
       <select name='epicId' onChange={handleChange}>
         <option value={''}>Any epic</option>
-        {epics?.map(epic => <option key={epic.id}>{epic.name}</option>)}
+        {epics?.map(epic => <option key={epic.id}>{epic.id}</option>)}
+      </select>
+      <select onChange={(e) => {
+        if (!sprints) return;
+        onSprintSelect(sprints[+e.target.value]);
+      }} placeholder="Select sprint">
+        <option value={''}>No sprint</option>
+        {sprints?.map((sprint, idx) => <option key={sprint.id} value={idx}>{sprint.name}</option>)}
       </select>
       <button onClick={() => console.log('create sprint')}>
         Create sprint

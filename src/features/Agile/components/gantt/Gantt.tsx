@@ -27,8 +27,8 @@ export type GanttProps = {
 };
 
 export function Gantt({ projectId }: GanttProps) {
-  const [sprints] = useSprints(projectId);
-  const [epics] = useEpics(projectId);
+  const { data: sprints } = useSprints(projectId);
+  const { data: epics } = useEpics(projectId);
   console.table(sprints)
   console.table(epics)
 

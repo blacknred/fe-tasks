@@ -114,6 +114,7 @@ export const generateIssues = (length: number): IIssue[] => {
   const now = Date.now();
   const priorities = Object.values(IssuePriority);
   const users = generateUsers(10);
+  const epicIds: string[] = [];
 
   return Array.from({ length: Math.max(10, length) }, (_, i) => {
     const random = Math.random();
@@ -140,20 +141,22 @@ export const generateIssues = (length: number): IIssue[] => {
     };
 
     if (issue.type === IssueType.EPIC) {
+      epicIds.push(issue.id);
       issue.startAt = new Date(now + i * EPIC_DURATION * DAY).toISOString();
       issue.endAt = new Date(
         now + (i * EPIC_DURATION + EPIC_DURATION) * DAY
       ).toISOString();
       issue.progress = 0;
+      issue.sprintId = undefined;
 
       return issue;
     }
 
     issue.priority = priorities[Math.floor(Math.random() * priorities.length)];
-    issue.sprintId = type === IssueType.EPIC || random < 0.7 ? undefined : "1";
+    issue.sprintId = ["1", "2", undefined][Math.floor(random * 3)];
 
     if (issue.type === IssueType.STORY) {
-      issue.epicId = Math.floor(random * 5).toString();
+      issue.epicId = epicIds[Math.floor(random * epicIds.length)];
       issue.points = 1;
     }
 
@@ -163,7 +166,7 @@ export const generateIssues = (length: number): IIssue[] => {
 
 export function filterIssues(issues: IIssue[], filters: IIssueFilters) {
   const { tag, type, assigneeId, priority, epicId, sprintId, search } = filters;
-  console.log(type);
+
   return issues.filter((issue) => {
     if (search && !issue.title.includes(search)) return false;
     if (type && issue.type !== type) return false;
@@ -182,6 +185,7 @@ export function prepareIssuesForBoard(
   columns: IBoardColumn[]
 ) {
   const grouped: Record<string, IIssue[]> = {};
+
   for (let status of STATUSSES) {
     grouped[status] = issues.filter((i) => i.status === status);
     const column = columns.find((c) => c.status === status);
@@ -199,5 +203,6 @@ export function findCurrentSprint(sprints: ISprint[]) {
   const currentSprint = sprints.find(
     (s) => new Date(s.startAt) < today && today < new Date(s.endAt)
   );
+
   return currentSprint?.id || "1";
 }

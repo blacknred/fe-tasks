@@ -16,7 +16,6 @@ export class Observable<
    */
   set state(state: State) {
     if (state === this._state) return;
-    console.log(this.listeners.size);
 
     this._state = state;
     this.listeners.forEach((listener) => {

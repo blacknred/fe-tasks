@@ -24,7 +24,7 @@ export function useObservable<T>(
 /** example
 const initialState: { id: string; name: string } = { id: "1", name: "sdfasdf" };
 
-class ExtendedTaskStore extends Observable<typeof initialState> {
+class ExtendedUserStore extends Observable<typeof initialState> {
   constructor() {
     super(initialState);
   }
@@ -36,9 +36,9 @@ class ExtendedTaskStore extends Observable<typeof initialState> {
   }
 }
 
-export const taskStore = new Observable(initialState);
-export const extendedTaskStore = new ExtendedTaskStore();
+export const userStore = new Observable(initialState);
+export const extendedUserStore = new ExtendedUserStore();
 
-export const useProject = () => useObservable(taskStore);
-export const useProjectName = () => useObservable(extendedTaskStore, extendedTaskStore.getName);
+export const useUser = () => useObservable(userStore);
+export const useUserName = () => useObservable(extendedUserStore, extendedUserStore.getName);
  */
