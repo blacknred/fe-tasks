@@ -5,7 +5,7 @@ import { useBoardIssues } from "../../api/getIssues";
 import { useStatusses } from "../../api/getStatusses";
 import { IBoardColumn, ID, IIssue, IIssueFilters, IIssueStatus } from "../../types";
 import { filterIssues } from "../../utils";
-import { DropArea } from "../DropArea";
+import { DropArea } from "../dropArea/DropArea";
 import styles from "./Board.module.css";
 import { Column } from "./Column";
 import { Header } from "./Header";
@@ -35,7 +35,7 @@ function BoardContent({ projectId, boardColumns, boardIssues, statusses }: Board
   const [columns, setColumns] = useState(boardColumns);
   const [issues, setIssues] = useState(boardIssues);
 
-  const handleColumnReposition = useCallback((prevIdx: string, nextIdx: string) => {
+  const handleColumnShift = useCallback((prevIdx: string, nextIdx: string) => {
     setColumns((prev) => {
       if (!prev) return prev;
       const [column] = prev.splice(+prevIdx, 1);
@@ -53,7 +53,7 @@ function BoardContent({ projectId, boardColumns, boardIssues, statusses }: Board
     })
   }, [])
 
-  const handleCardReposition = useCallback((nextColumn: string) => (id: string, nextIdx: string) => {
+  const handleCardShift = useCallback((nextColumn: string) => (id: string, nextIdx: string) => {
     // @ts-ignore smooth dom updates
     document.startViewTransition(() => {
       // sync update
@@ -108,7 +108,7 @@ function BoardContent({ projectId, boardColumns, boardIssues, statusses }: Board
       <br />
 
       <main className={styles.grid}>
-        <DropArea id={0} onDrop={handleColumnReposition} disabled={!isEditable} />
+        <DropArea id={0} onDrop={handleColumnShift} disabled={!isEditable} />
 
         {columns?.map((column, idx) => (
           <Fragment key={column.name}>
@@ -117,12 +117,12 @@ function BoardContent({ projectId, boardColumns, boardIssues, statusses }: Board
               name={column.name}
               cards={issues?.[column.status]}
               editable={isEditable}
-              onCardReposition={handleCardReposition(column.status)}
+              onCardReposition={handleCardShift(column.status)}
               onRemove={handleColumnRemove}
               onAddIssue={console.log}
             />
 
-            <DropArea id={idx + 1} onDrop={handleColumnReposition} disabled={!isEditable} />
+            <DropArea id={idx + 1} onDrop={handleColumnShift} disabled={!isEditable} />
           </Fragment>
         ))}
 

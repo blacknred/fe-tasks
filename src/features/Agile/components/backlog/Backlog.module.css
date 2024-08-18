@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.grid {
+  display: flex;
+
+
+  & > section {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+
+    /* & > ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 0px;
+      margin: 0px;
+
+      & > li {
+        border: 1px solid #aaa;
+        writing-mode: vertical-lr;
+        padding: 10px;
+      }
+    } */
+  }
+}

@@ -1,7 +1,7 @@
 import { Fragment, memo } from 'react';
 import { useDrag } from '../../../../hooks/useDrag';
 import { IIssue } from '../../types';
-import { DropArea } from '../DropArea';
+import { DropArea } from '../dropArea/DropArea';
 import styles from './Board.module.css';
 import { Card } from './Card';
 
@@ -20,7 +20,7 @@ export const Column = memo(({ cards, name, idx, editable, onAddIssue, onRemove, 
 
   return (
     // @ts-ignore
-    <div ref={draggable} id={idx} className={styles.column} data-disabled={!editable}>
+    <section ref={draggable} id={idx} className={styles.column} data-disabled={!editable}>
       <div>
         <p>{name.toUpperCase()}: {cards?.length}</p>
         {editable && <span onClick={() => onRemove(name)}>x</span>}
@@ -35,6 +35,6 @@ export const Column = memo(({ cards, name, idx, editable, onAddIssue, onRemove, 
           </Fragment>
         ))}
       </ul>
-    </div>
+    </section>
   );
 })

@@ -1,7 +1,7 @@
 import { forwardRef, Fragment, useEffect, useImperativeHandle, useState } from "react";
 import { useBacklogStories } from "../../api/getIssues";
 import { filterIssues } from "../../utils";
-import { DropArea } from "../DropArea";
+import { DropArea } from "../dropArea/DropArea";
 import { SectionRef } from "./Backlog";
 import { Item } from "./Item";
 

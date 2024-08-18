@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useDrop } from "../../../hooks/useDrop";
+import { useDrop } from "../../../../hooks/useDrop";
 import styles from './DropArea.module.css';
 
 type DropAreaProps = {

@@ -2,7 +2,7 @@ import { forwardRef, Fragment, Ref, useImperativeHandle, useState } from "react"
 import { useSprintIssues } from "../../api/getIssues";
 import { useSprints } from "../../api/getSprints";
 import { ISprint } from "../../types";
-import { DropArea } from "../DropArea";
+import { DropArea } from "../dropArea/DropArea";
 import { SectionRef } from "./Backlog";
 import { Item } from "./Item";
 

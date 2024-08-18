@@ -3,6 +3,7 @@ import { IIssue, IIssueFilters } from "../../types";
 import { BacklogSection } from "./BacklogSection";
 import { Header } from "./Header";
 import { SprintSection } from "./SprintSection";
+import styles from './Backlog.module.css';
 
 export type BacklogProps = {
   projectId: string;
@@ -41,7 +42,7 @@ export function Backlog({ projectId }: BacklogProps) {
         onSprintCreated={console.log}
       />
       <br />
-      <main>
+      <main className={styles.grid}>
         <SprintSection
           childRef={sprintRef}
           projectId={projectId}

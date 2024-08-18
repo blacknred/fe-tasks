@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "../../lib/router";
 import styles from "./Agile.module.css";
 import { Backlog } from "./components/backlog/Backlog";
-import { Board } from "./components/board/Board";
+import { Board } from "./components/board2/Board";
 import { Gantt } from "./components/gantt/Gantt";
 
 export function Agile() {
@@ -22,7 +22,7 @@ export function Agile() {
       <main className={styles.main}>
         {viewKind === 1 && <Gantt projectId={projectId} />}
         {viewKind === 2 && <Backlog projectId={projectId} />}
-        {viewKind === 3 && <Board projectId={projectId} />}
+        {viewKind === 3 && <Board />}
       </main>
     </>
   );

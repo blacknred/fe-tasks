@@ -9,7 +9,7 @@ import { Observable } from "./Observable";
  */
 export function useObservable<T>(
   store: Observable<T>,
-  selector?: () => Observable<T> | Partial<Observable<T>> | T[keyof T]
+  selector?: () => T | Partial<T> //| T[keyof T]
 ) {
   const [state, setState] = useState(selector?.() || store.state);
 
@@ -20,3 +20,25 @@ export function useObservable<T>(
 
   return state;
 }
+
+/** example
+const initialState: { id: string; name: string } = { id: "1", name: "sdfasdf" };
+
+class ExtendedTaskStore extends Observable<typeof initialState> {
+  constructor() {
+    super(initialState);
+  }
+  changeName(name: string) {
+    this.state.name = name;
+  }
+  getName() {
+    return this.state.name;
+  }
+}
+
+export const taskStore = new Observable(initialState);
+export const extendedTaskStore = new ExtendedTaskStore();
+
+export const useProject = () => useObservable(taskStore);
+export const useProjectName = () => useObservable(extendedTaskStore, extendedTaskStore.getName);
+ */
