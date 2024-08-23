@@ -6,7 +6,7 @@ const Charts = lazy(() => import("./features/Charts"));
 const Countdown = lazy(() => import("./features/Countdown"));
 const Map = lazy(() => import("./features/Map"));
 const TicTacToe = lazy(() => import("./features/TicTacToe"));
-const WhackAMolly = lazy(() => import("./features/WhackAMolly"));
+const WhackAMolly = lazy(() => import("./features/WhacAMole"));
 const ReactOrder = lazy(() => import("./features/ReactOrder"));
 const Agile = lazy(() => import("./features/Agile"));
 

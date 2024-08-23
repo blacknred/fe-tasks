@@ -1,5 +1,5 @@
 import { Dispatch, memo, SetStateAction, useEffect, useState } from "react";
-import styles from "../WhackAMolly.module.css";
+import styles from "../WhacAMole.module.css";
 
 export type BoardProps = {
   capacity: number;

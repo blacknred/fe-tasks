@@ -1,4 +1,4 @@
-import { forwardRef, Fragment, memo, MemoExoticComponent, ReactElement, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, Fragment, memo, MemoExoticComponent, ReactElement, useEffect, useImperativeHandle, useState } from 'react';
 import { useDrag } from '../../../../hooks/useDrag';
 import { IIssue, IIssueFilters } from '../../types';
 import { filterIssues } from '../../utils';
@@ -12,7 +12,8 @@ export type ColumnProps = {
   editable?: boolean;
   onRemove?: (name: string) => void;
   onDropItem: (draggableId: string, droppableId: string) => void;
-  ItemComponent: MemoExoticComponent<(props: IIssue & { disabled?: boolean }) => ReactElement>;
+  onUpdateItem: (data: IIssue) => void;
+  ItemComponent: MemoExoticComponent<(props: { data: IIssue, disabled?: boolean, onUpdate: (data: IIssue) => void }) => ReactElement>;
 };
 
 export type ColumnRef = {
@@ -21,14 +22,11 @@ export type ColumnRef = {
   add: (issue: IIssue, droppableIdx: string) => void;
 }
 
-export const Column = memo(forwardRef<ColumnRef, ColumnProps>(({ items: initialItems, name, onRemove, onDropItem, ItemComponent, idx, editable }, ref) => {
+export const Column = memo(forwardRef<ColumnRef, ColumnProps>(({ items: initialItems, name, onRemove, onDropItem, onUpdateItem, ItemComponent, idx, editable }, ref) => {
   const draggable = useDrag(undefined, !editable ? null : styles.drag);
 
   const [items, setItems] = useState(initialItems);
-
-  useEffect(() => {
-    setItems(initialItems);
-  }, [initialItems]);
+  useEffect(() => setItems(initialItems), [initialItems]);
 
   useImperativeHandle(ref, () => ({
     filter(filters) {
@@ -58,7 +56,7 @@ export const Column = memo(forwardRef<ColumnRef, ColumnProps>(({ items: initialI
     // @ts-ignore
     <section ref={draggable} id={idx} className={styles.column} data-disabled={!editable}>
       <div>
-        <p>{name.toUpperCase()}: {items?.length}</p>
+        <h4>{name.toUpperCase()} {items?.length}</h4>
         {editable && <span onClick={() => onRemove?.(name)}>x</span>}
         {!editable && <span onClick={() => console.log('add issue')}>+</span>}
       </div>
@@ -66,7 +64,7 @@ export const Column = memo(forwardRef<ColumnRef, ColumnProps>(({ items: initialI
         <DropArea id={0} onDrop={onDropItem} disabled={editable} />
         {items?.map((item, idx) => (
           <Fragment key={item.id}>
-            <ItemComponent {...item} disabled={editable} />
+            <ItemComponent data={item} disabled={editable} onUpdate={onUpdateItem} />
             <DropArea id={idx + 1} onDrop={onDropItem} disabled={editable} />
           </Fragment>
         ))}

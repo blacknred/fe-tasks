@@ -11,7 +11,7 @@
     background-color: lightgray;
     border: none;
     &.active {
-      background-color: brown;
+      background: url('./assets/mole.svg') no-repeat;
     }
   }
 }

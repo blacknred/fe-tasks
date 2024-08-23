@@ -22,6 +22,7 @@ export function BacklogSection({ projectId, onDropItem, innerRef }: SprintSectio
       name={'Backlog'}
       items={backlogStories}
       onDropItem={onDropItem()}
+      onUpdateItem={console.log}
       ItemComponent={Item}
     />
   )

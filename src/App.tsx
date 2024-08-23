@@ -34,7 +34,7 @@ function Header() {
           <Link path="/tic-tac-toe">TicTacToe</Link>
         </li>
         <li>
-          <Link path="/whack-a-molly">WhackAMolly</Link>
+          <Link path="/whack-a-molly">WhacAMole</Link>
         </li>
         <li>
           <Link path="/snake">Snake</Link>

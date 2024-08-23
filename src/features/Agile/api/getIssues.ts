@@ -1,23 +1,15 @@
 import useQuery from "../../../hooks/useQuery";
 import { ID, IIssue, IIssueFilters, IssueType } from "../types";
-import {
-  filterIssues,
-  findCurrentSprint,
-  generateIssues,
-  prepareIssuesForBoard,
-} from "../utils";
-import { board } from "./getBoard";
-import { sprints } from "./getSprints";
+import { filterIssues } from "../utils";
+import { DB } from "./db";
 import { HOST } from "./host";
-
-export const issues = generateIssues(200);
 
 const useIssues = (projectId: ID, params: IIssueFilters = {}) =>
   useQuery<IIssue[]>(
     // @ts-ignore
     HOST + `projects/${projectId}/issues?${new URLSearchParams(params)}`,
     {
-      fallback: filterIssues(issues, params),
+      fallback: DB.findIssues(params),
     }
   );
 
@@ -34,25 +26,9 @@ export const useSprintIssues = (projectId: ID, params?: IIssueFilters) =>
     // @ts-ignore
     HOST + `projects/${projectId}/issues?${new URLSearchParams(params)}`,
     {
-      fallback: filterIssues(issues, {
+      fallback: filterIssues(DB.issues, {
         ...params,
-        sprintId: params?.sprintId || findCurrentSprint(sprints),
+        sprintId: params?.sprintId || DB.findActiveSprint()?.id,
       }),
-      skipInitial: params?.sprintId === undefined,
-    }
-  );
-
-export const useBoardIssues = (projectId: ID, params?: IIssueFilters) =>
-  useQuery<Record<string, IIssue[]>>(
-    // @ts-ignore
-    HOST + `projects/${projectId}/issues?${new URLSearchParams(params)}`,
-    {
-      fallback: prepareIssuesForBoard(
-        filterIssues(issues, {
-          ...params,
-          sprintId: findCurrentSprint(sprints),
-        }),
-        board.columns
-      ),
     }
   );

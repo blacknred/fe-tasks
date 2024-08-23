@@ -1,6 +1,6 @@
 export type ID = string;
 
-export interface IUserPreview {
+export interface IProfile {
   id: ID;
   fullname: string;
   image?: string;
@@ -10,8 +10,8 @@ export interface ISprint {
   id: ID;
   projectId: ID;
   name: string;
-  startAt: string;
-  endAt: string;
+  startAt: number;
+  endAt: number;
 }
 
 export interface IBoardColumn {
@@ -21,9 +21,12 @@ export interface IBoardColumn {
 }
 
 export interface IBoard {
+  id: ID;
   projectId: ID;
+  name: string;
+  type: "scrum" | "kanban";
   columns: IBoardColumn[];
-  filter?: string;
+  filters?: IIssueFilters;
 }
 
 export enum IssueType {
@@ -58,11 +61,10 @@ export interface IIssue {
   id: ID;
   projectId: ID;
   type: IssueType;
-  name: string;
   title: string;
-  assignee?: IUserPreview;
-  startAt?: string;
-  endAt?: string;
+  assignee?: IProfile;
+  startAt?: number;
+  endAt?: number;
   progress?: number;
   version?: number;
   tags?: string[];
@@ -84,12 +86,11 @@ export type IStoryIssue = Omit<IIssue, "type" | "points" | "epicId"> & {
   epicId: ID;
 };
 
-export type IIssueFilters = Partial<{
-  search: string;
-  type: IssueType;
-  priority: IssuePriority;
-  tag: string;
-  assigneeId: ID;
-  epicId: ID;
-  sprintId: ID | null;
-}>;
+export type IIssueFilters = Partial<
+  Pick<IIssue, "type" | "priority" | "epicId" | "startAt" | "endAt">
+> & {
+  tag?: string;
+  search?: string;
+  assigneeId?: ID;
+  sprintId?: ID | null;
+};

@@ -1,26 +1,19 @@
 import { useRef } from "react";
 import useSubscription from "../../../hooks/useSubscription";
 import { IPlanePosition, IPositionBoundaries } from "../types";
-import { planePositionGenerator } from "../utils";
+import { DB } from "./db";
 
 const HOST = "https://echo.websocket.org/.ws";
 
 export const usePlanePositions = (boundaries: IPositionBoundaries) => {
-  let timer = useRef<NodeJS.Timeout>();
+  let unsubscribe = useRef<() => void>();
 
   const subscription = useSubscription<IPlanePosition[]>(HOST, {
     type: "websocket",
-    onError: console.error,
     onConnect() {
-      const generator = planePositionGenerator(boundaries);
-
-      timer.current = setInterval(() => {
-        subscription.sendMessage?.(generator.next().value);
-      }, 1000);
+      unsubscribe.current = DB.subscribe(subscription, boundaries);
     },
-    onDisconnect() {
-      clearInterval(timer.current);
-    },
+    onDisconnect: unsubscribe.current
   });
 
   if (typeof subscription.lastMessage === "string") {

@@ -1,8 +1,27 @@
 .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
+  & > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  & > ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    /* flex-direction: column; */
+    cursor: pointer;
+    padding: 0px;
+    margin: 0px;
+
+    & > li {
+      border: 1px solid #aaa;
+      /* writing-mode: vertical-lr; */
+      padding: 10px;
+    }
+  }
 }
 
 .grid {
@@ -10,91 +29,159 @@
   justify-content: center;
 }
 
-.statusList {
-  /* flex: 1; */
-  display: flex;
-  justify-content: end;
-
-  & > ul {
-    list-style: none;
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    cursor: pointer;
-    padding: 0px;
-    margin: 0px;
-
-    & > li {
-      border: 1px solid #aaa;
-      writing-mode: vertical-lr;
-      padding: 10px;
-    }
-  }
-}
-
 .card {
-  border-radius: 5px;
   cursor: pointer;
-  color: white;
-  background-color: #999;
-  padding: 0.8rem;
+  background-color: white;
+  padding: 0 0.8rem;
   text-align: left;
   display: flex;
   flex-direction: column;
+  box-shadow: 3px 3px #ddd;
 
-  & > div:first-of-type > span {
-    padding: 0.1rem;
-    width: max-content;
-    font-size: small;
+  & > dialog::backdrop {
+    background-color: #000;
+    opacity: 0.4;
+  }
 
-    &[data-priority="HIGH"] {
-      background-color: coral;
-    }
-    &[data-priority="MEDIUM"] {
-      background-color: orange;
-    }
-    &[data-priority="LOW"] {
-      background-color: green;
-    }
-    &[data-priority="TRIVIAL"] {
-      background-color: grey;
-    }
-    &[data-priority="CRITICAL"] {
-      background-color: red;
-    }
-    &[data-priority="BLOCKER"] {
-      background-color: black;
+  &:has([data-priority="CRITICAL"]) {
+    border: 1px solid red;
+  }
+
+  &:has([data-priority="BLOCKER"]) {
+    border: 2px solid black;
+  }
+
+  & > p:nth-of-type(2) {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    color: #555;
+
+    & > span {
+      background-color: #bc73732b;
+      padding: 3px 6px;
     }
   }
 
-  & > div:last-of-type {
+  & > div > p > span {
+    padding: 5px;
+    margin-right: 5px;
+    width: max-content;
+
+    &[data-start] {
+      background-color: #0080001b;
+      color: #008000;
+
+      &::before {
+        content: " \2191";
+      }
+    }
+
+    &[data-end] {
+      background-color: #ff00001b;
+      color: red;
+
+      &::before {
+        content: " \2193";
+      }
+    }
+  }
+
+  & > p:last-of-type {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     & > span {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      align-items: center;
 
-      & > span:first-of-type {
-        width: 1rem;
-        height: 1rem;
-        border-radius: 5px;
+      & [data-priority] {
+        font-size: xx-large;
 
-        &[data-type="TASK"] {
-          background-color: green;
+        /* &::before {
+          content: "\21D5";
+        } */
+
+        &[data-priority="BLOCKER"] {
+          color: black;
+
+          &::after {
+            content: "\2191\2191\2191";
+          }
         }
-        &[data-type="STORY"] {
-          background-color: orange;
+
+        &[data-priority="CRITICAL"] {
+          color: red;
+
+          &::after {
+            content: " \21C8";
+          }
+        }
+
+        &[data-priority="HIGH"] {
+          color: red;
+
+          &::after {
+            content: " \2191";
+          }
+        }
+
+        &[data-priority="MEDIUM"] {
+          color: orange;
+
+          &::after {
+            content: " \003D";
+          }
+        }
+
+        &[data-priority="LOW"] {
+          color: #ccc;
+
+          &::after {
+            content: " \21CA";
+          }
+        }
+
+        &[data-priority="TRIVIAL"] {
+          color: #ccc;
+
+          &::after {
+            content: " \2193";
+          }
         }
       }
-    }
 
-    & > img {
-      border-radius: 50%;
-      width: 1.5rem;
-      height: 1.5rem;
-      background-color: #fff;
+      &[data-type] {
+        &::before {
+          content: "\2609";
+          font-size: xxx-large;
+          margin-top: -4px;
+        }
+
+        &[data-type="STORY"] {
+          &::before {
+            color: red;
+          }
+        }
+        &[data-type="TASK"] {
+          &::before {
+            color: green;
+          }
+        }
+        &[data-type="BUG"] {
+          &::before {
+            color: orange;
+          }
+        }
+      }
+
+      & > img {
+        width: 1.6rem;
+        height: 1.6rem;
+        background-color: #ccc;
+      }
     }
   }
 }

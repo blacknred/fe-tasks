@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useReversibleState } from "./useReversibleState";
 
 const TIMEOUT = 10000;
 
@@ -18,21 +19,18 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
   url: RequestInfo | URL,
   options?: Options<DataType, ErrorType>
 ) {
-  const [data, setData] = useState<DataType>();
+  const [data, setData, revert] = useReversibleState<DataType>();
   const [error, setError] = useState<ErrorType>();
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const memoizedOptions = useRef<typeof options>(options);
-  const optimisticDataStack = useRef<DataType[]>([]);
-
-  if (options?.fallback !== memoizedOptions.current?.fallback) {
-    memoizedOptions.current!.fallback = options?.fallback;
-  }
-
   const isMounted = useRef(true);
 
   const refetch = useCallback(
-    async function (reset = false) {
+    async function ({
+      reset = false,
+      optimisticData,
+    }: { reset?: boolean; optimisticData?: DataType } = {}) {
       const {
         onError,
         interceptor,
@@ -48,8 +46,8 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
       let attempt = 0;
 
       if (reset) setIsFetching(true);
+      if (optimisticData) setData(optimisticData);
 
-      // if (!offline) {
       while (attempt < attempts) {
         try {
           const res = await fetch(url, init);
@@ -66,54 +64,35 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
             setData(data as DataType);
           }
 
-          optimisticDataStack.current.pop();
           break;
         } catch (err) {
           if (!isMounted.current) return;
+          if (attempt + 1 < attempts) return;
+
+          if (optimisticData) revert();
           if (fallback !== undefined) setData(fallback);
           onError?.(err as ErrorType);
         } finally {
           attempt++;
         }
       }
-      // }
 
       if (reset) setIsFetching(false);
     },
     [url, memoizedOptions, isMounted]
   );
 
-  const mutate = useCallback(
-    (optimisticData: DataType) => {
-      setData((prev) => {
-        if (prev) optimisticDataStack.current.push(prev);
-        return optimisticData;
-      });
-
-      return (full = false) => {
-        if (full) {
-          const state = optimisticDataStack.current.shift();
-          if (!state) return;
-          setData(state);
-          optimisticDataStack.current.length = 0;
-        } else {
-          const state = optimisticDataStack.current.pop();
-          if (state) setData(state);
-        }
-      };
-    },
-    [refetch]
-  );
-
   useEffect(() => {
     const { skipInitial, refetchInterval, watchOnline, watchVisibility } =
       memoizedOptions.current || {};
 
-    if (!skipInitial) refetch(true);
+    if (!skipInitial) refetch({ reset: true });
 
     let interval: NodeJS.Timeout;
 
-    const handleVisibilityRefetch = () => !document.hidden && refetch();
+    const handleVisibilityRefetch = () => {
+      if (document.hidden) refetch();
+    };
     if (watchVisibility) {
       window.document.addEventListener(
         "visibilitychange",
@@ -133,13 +112,25 @@ export default function useQuery<DataType = unknown, ErrorType = unknown>(
     return () => {
       isMounted.current = false;
       if (interval) clearInterval(interval);
-      window.removeEventListener("online", handleOnlineRefetch);
-      window.document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityRefetch
-      );
+      if (watchOnline) {
+        window.removeEventListener("online", handleOnlineRefetch);
+      }
+      if (watchVisibility) {
+        window.document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityRefetch
+        );
+      }
     };
   }, [refetch]);
 
-  return { data, error, isFetching, refetch, mutate } as const;
+  // const experimental_mutate = useCallback(
+  //   (optimisticData: DataType) => {
+  //     setData(optimisticData);
+  //     return revert;
+  //   },
+  //   [revert]
+  // );
+
+  return { data, error, isFetching, refetch } as const;
 }

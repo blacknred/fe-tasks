@@ -21,13 +21,13 @@ export const SprintSection = forwardRef<SprintSectionRef, SprintSectionProps>(({
   console.log(sprint?.id, issues?.length)
 
   useImperativeHandle(ref, () => ({
-    update(sprint) {
-      setSprint(sprint);
+    update(sprin) {
+      setSprint(sprin);
       refetch();
     }
   }), [setSprint])
 
-  if (!sprint) return null;
+  // if (!sprint) return null;
   if (!issues) return 'No issues found';
 
   return (
@@ -35,9 +35,10 @@ export const SprintSection = forwardRef<SprintSectionRef, SprintSectionProps>(({
       // key={issues.length}
       idx={0}
       ref={innerRef}
-      name={sprint.name}
+      name={'sprint.name'}
       items={issues}
-      onDropItem={onDropItem(sprint.id)}
+      onDropItem={onDropItem('sprint.id')}
+      onUpdateItem={console.log}
       ItemComponent={Item}
     />
   )

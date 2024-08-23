@@ -3,7 +3,7 @@ import { useEpics } from "../../api/getIssues";
 import { SectionRef } from "./Backlog";
 import styles from './Backlog.module.css';
 import { IIssueFilters } from "../../types";
-import { useSprints } from "../../api/getSprints";
+import { useActiveSprint, useSprints } from "../../api/getSprints";
 import { SprintSectionRef } from "./SprintSection";
 
 export type HeaderProps = {
@@ -15,6 +15,8 @@ export type HeaderProps = {
 export const Header = memo(({ projectId, onFilterChange, onSprintSelect }: HeaderProps) => {
   const { data: epics } = useEpics(projectId);
   const { data: sprints } = useSprints(projectId);
+  const { data: activeSprint } = useActiveSprint(projectId);
+
   const ref = useRef<IIssueFilters>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -34,9 +36,8 @@ export const Header = memo(({ projectId, onFilterChange, onSprintSelect }: Heade
       <select onChange={(e) => {
         if (!sprints) return;
         onSprintSelect(sprints[+e.target.value]);
-      }} placeholder="Select sprint">
-        <option value={''}>No sprint</option>
-        {sprints?.map((sprint, idx) => <option key={sprint.id} value={idx}>{sprint.name}</option>)}
+      }} placeholder="Select sprint" defaultValue={activeSprint?.id}>
+        {sprints?.map((sprint, idx) => <option key={sprint.id} value={sprint.id}>{sprint.name}</option>)}
       </select>
       <button onClick={() => console.log('create sprint')}>
         Create sprint

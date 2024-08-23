@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styles from "./WhackAMolly.module.css";
+import styles from "./WhacAMole.module.css";
 import { Board } from "./components/Board";
 import { Timer } from "./components/Timer";
 import { DURATION } from "./utils";
 
-export type WhackAMollyProps = {
+export type WhacAMoleProps = {
   capacity?: number;
 };
 
-export function WhackAMolly({ capacity = 64 }: WhackAMollyProps) {
+export function WhacAMole({ capacity = 64 }: WhacAMoleProps) {
   const [status, setStatus] = useState<0 | 1 | 2>(0);
   const [score, setScore] = useState<number>(0);
 
@@ -34,7 +34,7 @@ export function WhackAMolly({ capacity = 64 }: WhackAMollyProps) {
 
   return (
     <>
-      <h1>Whack A Molly</h1>
+      <h1>Whac A Mole</h1>
       <header className={styles.header}>
         {status === 0 ? (
           <>
